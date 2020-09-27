@@ -183,9 +183,11 @@ __webpack_require__.r(__webpack_exports__);
         icon: "fas fa-circle-notch"
       }],
       ip: "",
+      config: undefined,
       user: "",
       pisos: "",
       pisoActual: "0",
+      cajaId: undefined,
       mesas: "",
       mesaId: "",
       mesaActual: "",
@@ -197,8 +199,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   watch: {
     pisos: function pisos(val) {
-      if (Object.keys(val).length > 0) {
-        var index = Object.keys(val)[0];
+      if (val.length > 0) {
+        var index = val[0].id;
 
         if (this.pisoActual == "0") {
           this.getMesas(index);
@@ -214,6 +216,8 @@ __webpack_require__.r(__webpack_exports__);
     this.ip = this.$store.getters.getIP;
     this.user = this.$store.getters.getUSERNAME;
     this.pisoActual = this.$store.getters.getPISO_ACTUAL;
+    this.cajaId = this.$store.getters.getCASH_BOX_ID;
+    this.config = JSON.parse(this.$store.getters.getCONFIG_AXIOS);
   },
   methods: {
     getMesas: function getMesas(piso) {
@@ -222,12 +226,24 @@ __webpack_require__.r(__webpack_exports__);
       this.mesas = [];
       this.loading = true;
       this.pisoActual = piso;
-      axios.get("".concat(this.ip, "/?nomFun=tb_mesas&parm_pin=").concat(this.pin, "&parm_piso=").concat(piso, "&parm_tipo=M$")).then(function (_ref) {
+      axios.post("/api/tablet/mesas", {
+        caja: this.cajaId,
+        piso: this.pisoActual
+      }, this.config).then(function (_ref) {
         var data = _ref.data;
         _this.loading = false;
         _this.mesas = data.mesas;
       })["catch"](function (error) {
-        console.log(error);
+        if (error.response) {
+          if (error.response.status === 401) {
+            _this.sesionCaducada();
+          }
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        } // console.log(error.config);
+
       });
     },
     getIcon: function getIcon(item) {
@@ -505,8 +521,10 @@ __webpack_require__.r(__webpack_exports__);
       if (item.st_cmd == "") {
         this.dialog = true;
       } else {
-        var url = "".concat(this.ip, "/?nomFun=tb_revisar_cmd&parm_pin=").concat(this.pin, "&parm_piso=").concat(this.pisoActual, "&parm_id_cmd=").concat(item.id_cmd, "&parm_tipocmd=1&parm_id_mesero=").concat(id, "&parm_tipo=M$");
-        axios.get(url).then(function (_ref2) {
+        var url = "api/tablet/comanda/nueva";
+        axios.post(url, {
+          id: this.mesaId
+        }, this.config).then(function (_ref2) {
           var data = _ref2.data;
 
           if (data.status !== 0) {
@@ -534,8 +552,10 @@ __webpack_require__.r(__webpack_exports__);
                   title: "Advertencia!",
                   text: data.msg,
                   icon: "warning",
-                  confirmButtonText: "Cool"
+                  confirmButtonText: "OK"
                 });
+
+                _this2.getMesas(_this2.pisoActual);
               } else {
                 _this2.$router.push({
                   name: "Store"
@@ -546,7 +566,14 @@ __webpack_require__.r(__webpack_exports__);
             }
           }
         })["catch"](function (error) {
-          console.log(error);
+          if (error.response) {
+            if (error.response.status === 401) {
+              _this2.sesionCaducada();
+            }
+          } else if (error.request) {// console.log(error.request);
+          } else {// console.log("Error", error.message);
+            } // console.log(error.config);
+
         });
       }
     },
@@ -704,6 +731,17 @@ __webpack_require__.r(__webpack_exports__);
       this.$router.push({
         name: "Login"
       });
+    },
+    sesionCaducada: function sesionCaducada() {
+      Swal.fire({
+        title: "Advertencia!",
+        text: "La sesion ha caducado",
+        icon: "warning",
+        confirmButtonText: "OK"
+      });
+      this.$router.push({
+        name: "Login"
+      });
     }
   }
 });
@@ -805,17 +843,17 @@ var render = function() {
                                 tile: "",
                                 "input-value": active,
                                 color:
-                                  index == _vm.pisoActual
+                                  item.id == _vm.pisoActual
                                     ? "black"
                                     : "light-green darken-4"
                               },
                               on: {
                                 click: function($event) {
-                                  return _vm.getMesas(index)
+                                  return _vm.getMesas(item.id)
                                 }
                               }
                             },
-                            [_vm._v(_vm._s(item))]
+                            [_vm._v(_vm._s(item.name))]
                           )
                         ]
                       }
@@ -889,7 +927,7 @@ var render = function() {
                       },
                       on: {
                         click: function($event) {
-                          return _vm.actionMesa(item, index)
+                          return _vm.actionMesa(item, item.id)
                         }
                       }
                     },

@@ -47,7 +47,7 @@
               :input-value="active"
               color="light-blue darken-4"
               @click="getArticles(item)"
-            >{{item.nombre}}</v-btn>
+            >{{item.name}}</v-btn>
           </v-slide-item>
         </v-slide-group>
       </v-toolbar>
@@ -63,9 +63,9 @@
             class="pa-2 mt-4 ml-4"
             @click="addToMesa(item,index)"
           >
-            <v-card-text class="black--text" style="height:5rem!important">{{item.nombre}}</v-card-text>
+            <v-card-text class="black--text" style="height:5rem!important">{{item.name}}</v-card-text>
             <v-card-actions class="black">
-              <strong>S/.{{item.precio}}</strong>
+              <strong>S/.{{item.total}}</strong>
             </v-card-actions>
           </v-card>
         </v-card>
@@ -86,10 +86,10 @@
     </v-footer>
     <v-dialog v-model="dialog" persistent max-width="600px">
       <v-card>
-        <v-card-text  class="p-0">
-          <v-container  class="pt-0 pb-0">
+        <v-card-text class="p-0">
+          <v-container class="pt-0 pb-0">
             <v-row>
-              <v-col cols="12"  class="pt-0 pb-0">
+              <v-col cols="12" class="pt-0 pb-0">
                 <v-text-field
                   class="centered-input display-1"
                   label="Ingrese nota de comanda"
@@ -128,12 +128,13 @@ export default {
     mesa: "",
     mesaId: "",
     total: "",
-    pin: "",
+    config: "",
     dialog: false,
     noteCmd: "",
     numcomen: 0,
     cantidad: 0,
-    userID: 0
+    userID: 0,
+    pin: undefined
   }),
   computed: {
     artList() {
@@ -144,20 +145,25 @@ export default {
     this.familias = JSON.parse(this.$store.getters.getFAMILIAS);
     this.mesa = JSON.parse(this.$store.getters.get_MESA_ACTUAL);
     this.mesaId = this.$store.getters.get_ID_MESA_ACTUAL;
-    this.pin = this.$store.getters.getPIN;
-    this.ip = this.$store.getters.getIP;
     this.userID = this.$store.getters.getUSERID;
+    this.config = JSON.parse(this.$store.getters.getCONFIG_AXIOS);
     this.getArticlesinMesa();
   },
   methods: {
     getArticles(fam) {
       this.articulos = [];
-      this.articulos = fam.json_prod;
+      this.articulos = fam.menus;
     },
     getArticlesinMesa() {
-      var url = `${this.ip}/?nomFun=tb_item_3p&parm_pin=${this.pin}&parm_piso=20&parm_id_mesas=${this.mesaId}&parm_id_cmd=${this.mesa.id_cmd}&parm_id_mesero=${this.userID}&parm_tipo=M$`;
+      var url = `api/tablet/comanda/item/listar`;
       axios
-        .get(url)
+        .post(
+          url,
+          {
+            id_mesa: this.mesaId
+          },
+          this.config
+        )
         .then(({ data }) => {
           if (data.msg == "Ok") {
             this.articlesEnMesa = data.prod;
@@ -167,18 +173,34 @@ export default {
               title: "Advertencia!",
               text: data.msg,
               icon: "warning",
-              confirmButtonText: "Cool"
+              confirmButtonText: "OK"
             });
           }
         })
         .catch(error => {
-          console.log(error);
+          if (error.response) {
+            if (error.response.status === 401) {
+              this.sesionCaducada();
+            }
+          } else if (error.request) {
+            // console.log(error.request);
+          } else {
+            // console.log("Error", error.message);
+          }
+          // console.log(error.config);
         });
     },
     addToMesa(item, index) {
-      var url = `${this.ip}/?nomFun=tb_item&parm_pin=${this.pin}&parm_piso=20&parm_id_mesas=${this.mesaId}&parm_id_prod=${index}&parm_cant=1&parm_id_cmd=${this.mesa.id_cmd}&parm_id_mesero=${this.userID}&parm_tipo=M$`;
+      var url = `api/tablet/comanda/item/agregar `;
       axios
-        .get(url)
+        .post(
+          url,
+          {
+            id_mesa: this.mesaId,
+            id_producto: item.id
+          },
+          this.config
+        )
         .then(({ data }) => {
           if (data.msg == "Ok") {
             this.articlesEnMesa = data.prod;
@@ -188,12 +210,21 @@ export default {
               title: "Advertencia!",
               text: data.msg,
               icon: "warning",
-              confirmButtonText: "Cool"
+              confirmButtonText: "OK"
             });
           }
         })
         .catch(error => {
-          console.log(error);
+          if (error.response) {
+            if (error.response.status === 401) {
+              this.sesionCaducada();
+            }
+          } else if (error.request) {
+            // console.log(error.request);
+          } else {
+            // console.log("Error", error.message);
+          }
+          // console.log(error.config);
         });
     },
     addNote() {
@@ -210,7 +241,7 @@ export default {
               title: "Advertencia!",
               text: data.msg,
               icon: "warning",
-              confirmButtonText: "Cool"
+              confirmButtonText: "OK"
             });
           }
         })
@@ -231,12 +262,21 @@ export default {
           title: "Advertencia!",
           text: "Esta accion solo la puede ejecutar un administrador",
           icon: "warning",
-          confirmButtonText: "Cool"
+          confirmButtonText: "OK"
         });
       } else {
         var url = `${this.ip}/?nomFun=tb_item&parm_pin=${this.pin}&parm_piso=20&parm_id_mesas=${this.mesaId}&parm_id_prod=${item.idprod}&parm_cant=${cant}&parm_id_cmd=${this.mesa.id_cmd}&parm_id_mesero=${this.userID}&parm_tipo=M$`;
         axios
-          .get(url)
+          .post(
+            url,
+            {
+              id_mesa: this.mesaId,
+              id_producto: item.idprod,
+              id_detalle: item.id,
+              cantidad: cant
+            },
+            this.config
+          )
           .then(({ data }) => {
             if (data.msg == "Ok") {
               this.articlesEnMesa = data.prod;
@@ -246,7 +286,7 @@ export default {
                 title: "Advertencia!",
                 text: data.msg,
                 icon: "warning",
-                confirmButtonText: "Cool"
+                confirmButtonText: "OK"
               });
             }
           })
@@ -282,7 +322,7 @@ export default {
               title: "Enviado a cocina!",
               text: data.msg,
               icon: "success",
-              confirmButtonText: "Cool"
+              confirmButtonText: "OK"
             });
             this.salir();
           } else {
@@ -290,7 +330,7 @@ export default {
               title: "Advertencia!",
               text: data.msg,
               icon: "warning",
-              confirmButtonText: "Cool"
+              confirmButtonText: "OK"
             });
           }
         })
@@ -313,7 +353,7 @@ export default {
               title: "Advertencia!",
               text: data.msg,
               icon: "warning",
-              confirmButtonText: "Cool"
+              confirmButtonText: "OK"
             });
           }
         })
@@ -333,7 +373,7 @@ export default {
               title: "Advertencia!",
               text: data.msg,
               icon: "warning",
-              confirmButtonText: "Cool"
+              confirmButtonText: "OK"
             }).then(result => {
               if (result.value) {
                 this.$router.push({ name: "Home" });
@@ -344,6 +384,15 @@ export default {
         .catch(error => {
           console.log(error);
         });
+    },
+    sesionCaducada() {
+      Swal.fire({
+        title: "Advertencia!",
+        text: "La sesion ha caducado",
+        icon: "warning",
+        confirmButtonText: "OK"
+      });
+      this.$router.push({ name: "Login" });
     }
   }
 };

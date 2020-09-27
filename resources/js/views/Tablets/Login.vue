@@ -1,5 +1,5 @@
 <template>
-  <v-row justify="center" style="background-image: url('/img/fondo-login.jpg');">
+  <v-row justify="center" style="background-image: url('/img/fondo-login.jpg'); width: 100vw; height: 100vh; background-size: cover;">
     <v-col cols="12" sm="8" md="4">
       <v-card color="rgb(0, 0, 0, 0.4)" dark class="pa-2 mt-4">
         <v-card-title class="text-center headline mt-3">
@@ -68,16 +68,24 @@ export default {
       }
     },
     loggin() {
+      const store_id = this.$store.getters.getSTORE_ID;
       axios
-        .get(`/api/auth/mozo?pin=${this.password}`)
+        .get(`/api/auth/mozo?pin=${this.password}&shop_id=${store_id}`)
         .then(({ data }) => {
-          console.log(data);
           this.loading = false;
           if (data.status === 1) {
             this.$store.commit("SET_PISOS", JSON.stringify(data.pisos));
             this.$store.commit("SET_FAMILIAS", JSON.stringify(data.fam));
             this.$store.commit("SET_USER_NAME", data.nombre);
+            this.$store.commit("SET_CASH_BOX_ID", data.id_caja);
             this.$store.commit("SET_USER_ID", data.id_usr);
+            var config = {
+              headers: {
+                Authorization: "Bearer " + data.access_token
+              }
+            };
+            this.$store.commit("SET_CONFIG_AXIOS", JSON.stringify(config));
+            this.$store.commit("SET_PIN", this.password);
             this.$router.push({ name: "Home" });
           } else {
             this.password = "";
@@ -85,12 +93,27 @@ export default {
               title: "Advertencia!",
               text: data.msg,
               icon: "warning",
-              confirmButtonText: "Cool"
+              confirmButtonText: "OK"
             });
           }
         })
         .catch(error => {
-          console.log(error);
+          if (error.response) {
+            if (error.response.status === 401) {
+              Swal.fire({
+                title: "Advertencia!",
+                text: error.response.data.msg,
+                icon: "warning",
+                confirmButtonText: "OK"
+              });
+              this.password = "";
+            }
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+          // console.log(error.config);
         });
     }
   }

@@ -7,9 +7,9 @@
             class="ma-2 white--text card card-block"
             tile
             :input-value="active"
-            :color="index==pisoActual?'black':'light-green darken-4'"
-            @click="getMesas(index)"
-          >{{item}}</v-btn>
+            :color="item.id==pisoActual?'black':'light-green darken-4'"
+            @click="getMesas(item.id)"
+          >{{item.name}}</v-btn>
         </v-slide-item>
       </v-slide-group>
       <v-spacer></v-spacer>
@@ -29,7 +29,7 @@
             height="6rem"
             width="8rem"
             class="pa-2 mt-4 ml-4 mr-3"
-            @click="actionMesa(item,index)"
+            @click="actionMesa(item,item.id)"
           >
             <v-card-title class="p-0">
               {{item.nombre}}
@@ -163,9 +163,11 @@ export default {
       { accion: "MOVER", icon: "fas fa-circle-notch" }
     ],
     ip: "",
+    config: undefined,
     user: "",
     pisos: "",
     pisoActual: "0",
+    cajaId: undefined,
     mesas: "",
     mesaId: "",
     mesaActual: "",
@@ -176,8 +178,8 @@ export default {
   }),
   watch: {
     pisos(val) {
-      if (Object.keys(val).length > 0) {
-        var index = Object.keys(val)[0];
+      if (val.length > 0) {
+        var index = val[0].id;
         if (this.pisoActual == "0") {
           this.getMesas(index);
         } else {
@@ -192,6 +194,8 @@ export default {
     this.ip = this.$store.getters.getIP;
     this.user = this.$store.getters.getUSERNAME;
     this.pisoActual = this.$store.getters.getPISO_ACTUAL;
+    this.cajaId = this.$store.getters.getCASH_BOX_ID;
+    this.config = JSON.parse(this.$store.getters.getCONFIG_AXIOS);
   },
   methods: {
     getMesas(piso) {
@@ -199,15 +203,29 @@ export default {
       this.loading = true;
       this.pisoActual = piso;
       axios
-        .get(
-          `${this.ip}/?nomFun=tb_mesas&parm_pin=${this.pin}&parm_piso=${piso}&parm_tipo=M$`
+        .post(
+          `/api/tablet/mesas`,
+          {
+            caja: this.cajaId,
+            piso: this.pisoActual
+          },
+          this.config
         )
         .then(({ data }) => {
           this.loading = false;
           this.mesas = data.mesas;
         })
         .catch(error => {
-          console.log(error);
+          if (error.response) {
+            if (error.response.status === 401) {
+              this.sesionCaducada();
+            }
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+          // console.log(error.config);
         });
     },
     getIcon(item) {
@@ -337,15 +355,14 @@ export default {
               var i = this.arrayMesas.indexOf(ix);
               this.arrayMesas.splice(i, 1);
             } else {
-              if (this.arrayMesas.length<2) {
-              var mesa = {
-                id: index,
-                id_cmd: item.id_cmd,
-                st_cmd: item.st_cmd,
-                st_join: 1
-              };
-              this.arrayMesas.push(mesa);
-                
+              if (this.arrayMesas.length < 2) {
+                var mesa = {
+                  id: index,
+                  id_cmd: item.id_cmd,
+                  st_cmd: item.st_cmd,
+                  st_join: 1
+                };
+                this.arrayMesas.push(mesa);
               }
             }
           }
@@ -455,9 +472,9 @@ export default {
       if (item.st_cmd == "") {
         this.dialog = true;
       } else {
-        var url = `${this.ip}/?nomFun=tb_revisar_cmd&parm_pin=${this.pin}&parm_piso=${this.pisoActual}&parm_id_cmd=${item.id_cmd}&parm_tipocmd=1&parm_id_mesero=${id}&parm_tipo=M$`;
+        var url = `api/tablet/comanda/nueva`;
         axios
-          .get(url)
+          .post(url, { id: this.mesaId }, this.config)
           .then(({ data }) => {
             if (data.status !== 0) {
               this.$router.push({ name: "Store" });
@@ -479,8 +496,9 @@ export default {
                     title: "Advertencia!",
                     text: data.msg,
                     icon: "warning",
-                    confirmButtonText: "Cool"
+                    confirmButtonText: "OK"
                   });
+                  this.getMesas(this.pisoActual);
                 } else {
                   this.$router.push({ name: "Store" });
                   this.$store.commit("SET_PISO_ACTUAL", this.pisoActual);
@@ -489,7 +507,16 @@ export default {
             }
           })
           .catch(error => {
-            console.log(error);
+            if (error.response) {
+              if (error.response.status === 401) {
+                this.sesionCaducada();
+              }
+            } else if (error.request) {
+              // console.log(error.request);
+            } else {
+              // console.log("Error", error.message);
+            }
+            // console.log(error.config);
           });
       }
     },
@@ -564,7 +591,7 @@ export default {
         if (e.id_cmd != 0) {
           id_cmd = e.id_cmd;
         }
-        id_mesa =String(e.id);
+        id_mesa = String(e.id);
       });
       var url = `${this.ip}/?nomFun=tb_separar_mesa&parm_id_cmd=${id_cmd}&parm_id_mesa=${id_mesa}&parm_tipo=M$`;
       axios
@@ -624,6 +651,15 @@ export default {
     },
     logout() {
       this.$store.commit("SET_PIN", null);
+      this.$router.push({ name: "Login" });
+    },
+    sesionCaducada() {
+      Swal.fire({
+        title: "Advertencia!",
+        text: "La sesion ha caducado",
+        icon: "warning",
+        confirmButtonText: "OK"
+      });
       this.$router.push({ name: "Login" });
     }
   }

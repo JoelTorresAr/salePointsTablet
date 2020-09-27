@@ -20,23 +20,24 @@ class CreateCommandsTable extends Migration
             $table->unsignedBigInteger('command_type_id');
             $table->string('takeaway_name')->nullable();
             $table->unsignedBigInteger('floor_id');
-            $table->unsignedBigInteger('table_id');
+            $table->unsignedBigInteger('table_id')->nullable();
             $table->unsignedBigInteger('client_id')->nullable();
             $table->unsignedBigInteger('delivery_client_id')->nullable();
             $table->unsignedBigInteger('carrier_id')->nullable();
             $table->unsignedBigInteger('editing_by_id')->nullable();
-            $table->decimal('payment_with',17,2);
+            $table->string('editing_by_name')->nullable();
+            $table->decimal('payment_with',17,2)->default(0);
             $table->text('command_note')->nullable();
-            $table->string('state',1);
-            $table->string('edit_status')->default('0');
-            $table->decimal('subtotal',17,4);
-            $table->decimal('igv',17,4);
-            $table->decimal('total',17,4);
-            $table->string('sale_type',1);
-            $table->unsignedBigInteger('invoice_id');
-            $table->string('serie',8);
-            $table->string('number',8);
-            $table->unsignedBigInteger('pay_type_id');
+            $table->string('state',1)->nullable()->default(1);
+            $table->string('edit_status')->default('O');
+            $table->decimal('subtotal',17,4)->default(0);
+            $table->decimal('igv',17,4)->default(0);
+            $table->decimal('total',17,4)->default(0);
+            $table->string('sale_type',1)->nullable();
+            $table->unsignedBigInteger('invoice_id')->nullable();
+            $table->string('serie',8)->nullable();
+            $table->string('number',8)->nullable();
+            $table->unsignedBigInteger('pay_type_id')->nullable();
 
             $table->foreign('editing_by_id')->references('id')->on('users')
             ->onDelete('cascade')
@@ -50,9 +51,9 @@ class CreateCommandsTable extends Migration
             $table->foreign('floor_id')->references('id')->on('floors')
             ->onDelete('cascade')
             ->onUpdate('cascade');
-            $table->foreign('table_id')->references('id')->on('tables')
+           /* $table->foreign('table_id')->references('id')->on('tables')
             ->onDelete('cascade')
-            ->onUpdate('cascade');
+            ->onUpdate('cascade');*/
             $table->foreign('client_id')->references('id')->on('clients')
             ->onDelete('cascade')
             ->onUpdate('cascade');

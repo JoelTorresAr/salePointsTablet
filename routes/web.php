@@ -13,4 +13,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//Route::get('login',)
 Route::get('/{any}', 'HomeController@spa')->name('home')->where('any','.*');

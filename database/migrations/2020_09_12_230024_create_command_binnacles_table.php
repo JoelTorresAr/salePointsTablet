@@ -18,6 +18,7 @@ class CreateCommandBinnaclesTable extends Migration
             $table->string('operation',1);
             $table->unsignedBigInteger('command_id');
             $table->unsignedBigInteger('user_id');
+            $table->text('details');
             $table->dateTime('date_time')->useCurrent();
         });
     }

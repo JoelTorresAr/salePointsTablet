@@ -144,12 +144,13 @@ __webpack_require__.r(__webpack_exports__);
       mesa: "",
       mesaId: "",
       total: "",
-      pin: "",
+      config: "",
       dialog: false,
       noteCmd: "",
       numcomen: 0,
       cantidad: 0,
-      userID: 0
+      userID: 0,
+      pin: undefined
     };
   },
   computed: {
@@ -161,21 +162,22 @@ __webpack_require__.r(__webpack_exports__);
     this.familias = JSON.parse(this.$store.getters.getFAMILIAS);
     this.mesa = JSON.parse(this.$store.getters.get_MESA_ACTUAL);
     this.mesaId = this.$store.getters.get_ID_MESA_ACTUAL;
-    this.pin = this.$store.getters.getPIN;
-    this.ip = this.$store.getters.getIP;
     this.userID = this.$store.getters.getUSERID;
+    this.config = JSON.parse(this.$store.getters.getCONFIG_AXIOS);
     this.getArticlesinMesa();
   },
   methods: {
     getArticles: function getArticles(fam) {
       this.articulos = [];
-      this.articulos = fam.json_prod;
+      this.articulos = fam.menus;
     },
     getArticlesinMesa: function getArticlesinMesa() {
       var _this = this;
 
-      var url = "".concat(this.ip, "/?nomFun=tb_item_3p&parm_pin=").concat(this.pin, "&parm_piso=20&parm_id_mesas=").concat(this.mesaId, "&parm_id_cmd=").concat(this.mesa.id_cmd, "&parm_id_mesero=").concat(this.userID, "&parm_tipo=M$");
-      axios.get(url).then(function (_ref) {
+      var url = "api/tablet/comanda/item/listar";
+      axios.post(url, {
+        id_mesa: this.mesaId
+      }, this.config).then(function (_ref) {
         var data = _ref.data;
 
         if (data.msg == "Ok") {
@@ -186,18 +188,28 @@ __webpack_require__.r(__webpack_exports__);
             title: "Advertencia!",
             text: data.msg,
             icon: "warning",
-            confirmButtonText: "Cool"
+            confirmButtonText: "OK"
           });
         }
       })["catch"](function (error) {
-        console.log(error);
+        if (error.response) {
+          if (error.response.status === 401) {
+            _this.sesionCaducada();
+          }
+        } else if (error.request) {// console.log(error.request);
+        } else {// console.log("Error", error.message);
+          } // console.log(error.config);
+
       });
     },
     addToMesa: function addToMesa(item, index) {
       var _this2 = this;
 
-      var url = "".concat(this.ip, "/?nomFun=tb_item&parm_pin=").concat(this.pin, "&parm_piso=20&parm_id_mesas=").concat(this.mesaId, "&parm_id_prod=").concat(index, "&parm_cant=1&parm_id_cmd=").concat(this.mesa.id_cmd, "&parm_id_mesero=").concat(this.userID, "&parm_tipo=M$");
-      axios.get(url).then(function (_ref2) {
+      var url = "api/tablet/comanda/item/agregar ";
+      axios.post(url, {
+        id_mesa: this.mesaId,
+        id_producto: item.id
+      }, this.config).then(function (_ref2) {
         var data = _ref2.data;
 
         if (data.msg == "Ok") {
@@ -208,11 +220,18 @@ __webpack_require__.r(__webpack_exports__);
             title: "Advertencia!",
             text: data.msg,
             icon: "warning",
-            confirmButtonText: "Cool"
+            confirmButtonText: "OK"
           });
         }
       })["catch"](function (error) {
-        console.log(error);
+        if (error.response) {
+          if (error.response.status === 401) {
+            _this2.sesionCaducada();
+          }
+        } else if (error.request) {// console.log(error.request);
+        } else {// console.log("Error", error.message);
+          } // console.log(error.config);
+
       });
     },
     addNote: function addNote() {
@@ -231,7 +250,7 @@ __webpack_require__.r(__webpack_exports__);
             title: "Advertencia!",
             text: data.msg,
             icon: "warning",
-            confirmButtonText: "Cool"
+            confirmButtonText: "OK"
           });
         }
       })["catch"](function (error) {
@@ -256,11 +275,16 @@ __webpack_require__.r(__webpack_exports__);
           title: "Advertencia!",
           text: "Esta accion solo la puede ejecutar un administrador",
           icon: "warning",
-          confirmButtonText: "Cool"
+          confirmButtonText: "OK"
         });
       } else {
         var url = "".concat(this.ip, "/?nomFun=tb_item&parm_pin=").concat(this.pin, "&parm_piso=20&parm_id_mesas=").concat(this.mesaId, "&parm_id_prod=").concat(item.idprod, "&parm_cant=").concat(cant, "&parm_id_cmd=").concat(this.mesa.id_cmd, "&parm_id_mesero=").concat(this.userID, "&parm_tipo=M$");
-        axios.get(url).then(function (_ref4) {
+        axios.post(url, {
+          id_mesa: this.mesaId,
+          id_producto: item.idprod,
+          id_detalle: item.id,
+          cantidad: cant
+        }, this.config).then(function (_ref4) {
           var data = _ref4.data;
 
           if (data.msg == "Ok") {
@@ -271,7 +295,7 @@ __webpack_require__.r(__webpack_exports__);
               title: "Advertencia!",
               text: data.msg,
               icon: "warning",
-              confirmButtonText: "Cool"
+              confirmButtonText: "OK"
             });
           }
         })["catch"](function (error) {
@@ -310,7 +334,7 @@ __webpack_require__.r(__webpack_exports__);
             title: "Enviado a cocina!",
             text: data.msg,
             icon: "success",
-            confirmButtonText: "Cool"
+            confirmButtonText: "OK"
           });
 
           _this5.salir();
@@ -319,7 +343,7 @@ __webpack_require__.r(__webpack_exports__);
             title: "Advertencia!",
             text: data.msg,
             icon: "warning",
-            confirmButtonText: "Cool"
+            confirmButtonText: "OK"
           });
         }
       })["catch"](function (error) {
@@ -344,7 +368,7 @@ __webpack_require__.r(__webpack_exports__);
             title: "Advertencia!",
             text: data.msg,
             icon: "warning",
-            confirmButtonText: "Cool"
+            confirmButtonText: "OK"
           });
         }
       })["catch"](function (error) {
@@ -367,7 +391,7 @@ __webpack_require__.r(__webpack_exports__);
             title: "Advertencia!",
             text: data.msg,
             icon: "warning",
-            confirmButtonText: "Cool"
+            confirmButtonText: "OK"
           }).then(function (result) {
             if (result.value) {
               _this7.$router.push({
@@ -378,6 +402,17 @@ __webpack_require__.r(__webpack_exports__);
         }
       })["catch"](function (error) {
         console.log(error);
+      });
+    },
+    sesionCaducada: function sesionCaducada() {
+      Swal.fire({
+        title: "Advertencia!",
+        text: "La sesion ha caducado",
+        icon: "warning",
+        confirmButtonText: "OK"
+      });
+      this.$router.push({
+        name: "Login"
       });
     }
   }
@@ -613,7 +648,7 @@ var render = function() {
                                     }
                                   }
                                 },
-                                [_vm._v(_vm._s(item.nombre))]
+                                [_vm._v(_vm._s(item.name))]
                               )
                             ]
                           }
@@ -664,11 +699,11 @@ var render = function() {
                           staticClass: "black--text",
                           staticStyle: { height: "5rem!important" }
                         },
-                        [_vm._v(_vm._s(item.nombre))]
+                        [_vm._v(_vm._s(item.name))]
                       ),
                       _vm._v(" "),
                       _c("v-card-actions", { staticClass: "black" }, [
-                        _c("strong", [_vm._v("S/." + _vm._s(item.precio))])
+                        _c("strong", [_vm._v("S/." + _vm._s(item.total))])
                       ])
                     ],
                     1

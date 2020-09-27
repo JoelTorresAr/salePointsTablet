@@ -15,8 +15,10 @@ class CreateArchingsTable extends Migration
     {
         Schema::create('archings', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('date_time',0);
-            $table->string('state',1);
+            $table->dateTime('date_time',0)->useCurrent();
+            $table->string('state',1)->default('A');
+            $table->decimal('total',17,2);
+
         });
     }
 

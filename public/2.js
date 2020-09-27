@@ -84,9 +84,9 @@ __webpack_require__.r(__webpack_exports__);
     loggin: function loggin() {
       var _this = this;
 
-      axios.get("/api/auth/mozo?pin=".concat(this.password)).then(function (_ref) {
+      var store_id = this.$store.getters.getSTORE_ID;
+      axios.get("/api/auth/mozo?pin=".concat(this.password, "&shop_id=").concat(store_id)).then(function (_ref) {
         var data = _ref.data;
-        console.log(data);
         _this.loading = false;
 
         if (data.status === 1) {
@@ -96,7 +96,19 @@ __webpack_require__.r(__webpack_exports__);
 
           _this.$store.commit("SET_USER_NAME", data.nombre);
 
+          _this.$store.commit("SET_CASH_BOX_ID", data.id_caja);
+
           _this.$store.commit("SET_USER_ID", data.id_usr);
+
+          var config = {
+            headers: {
+              Authorization: "Bearer " + data.access_token
+            }
+          };
+
+          _this.$store.commit("SET_CONFIG_AXIOS", JSON.stringify(config));
+
+          _this.$store.commit("SET_PIN", _this.password);
 
           _this.$router.push({
             name: "Home"
@@ -107,11 +119,26 @@ __webpack_require__.r(__webpack_exports__);
             title: "Advertencia!",
             text: data.msg,
             icon: "warning",
-            confirmButtonText: "Cool"
+            confirmButtonText: "OK"
           });
         }
       })["catch"](function (error) {
-        console.log(error);
+        if (error.response) {
+          if (error.response.status === 401) {
+            Swal.fire({
+              title: "Advertencia!",
+              text: error.response.data.msg,
+              icon: "warning",
+              confirmButtonText: "OK"
+            });
+            _this.password = "";
+          }
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        } // console.log(error.config);
+
       });
     }
   }
@@ -186,7 +213,12 @@ var render = function() {
   return _c(
     "v-row",
     {
-      staticStyle: { "background-image": "url('/img/fondo-login.jpg')" },
+      staticStyle: {
+        "background-image": "url('/img/fondo-login.jpg')",
+        width: "100vw",
+        height: "100vh",
+        "background-size": "cover"
+      },
       attrs: { justify: "center" }
     },
     [

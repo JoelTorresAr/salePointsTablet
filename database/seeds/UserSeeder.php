@@ -21,5 +21,10 @@ class UserSeeder extends Seeder
             'pin'         => '1234',
             'state'      => 'A'
         ]);
+        $business->users()->Create([
+            'name'        => 'JOEL',
+            'pin'         => '5454',
+            'state'      => 'A'
+        ]);
     }
 }

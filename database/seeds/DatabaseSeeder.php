@@ -21,5 +21,9 @@ class DatabaseSeeder extends Seeder
         $this->call(AssignRolToUserSeeder::class);
         $this->call(MenuFamilySeeder::class);
         $this->call(MenuSeeder::class);
+        $this->call(TableSeeder::class);
+        $this->call(ArchingSeeder::class);
+        $this->call(OpeningSeeder::class);
+        $this->call(CommandTypeSeeder::class);
     }
 }

@@ -12,7 +12,9 @@ class AssignRolToUserSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::select('id')->first();
+        $user = User::select('id')->where('id',1)->first();
+        $user->assignRoles('mozo');
+        $user = User::select('id')->where('id',2)->first();
         $user->assignRoles('mozo');
     }
 }

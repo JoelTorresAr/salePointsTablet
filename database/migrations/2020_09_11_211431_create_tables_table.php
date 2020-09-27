@@ -17,8 +17,9 @@ class CreateTablesTable extends Migration
             $table->id();
             $table->string('name',70);
             $table->string('state',1);
+            $table->string('status',1)->default('L');
             $table->string('joined',1)->default('0');
-            $table->string('order_status',1)->nullable();
+            $table->string('order_status',1)->default('0');
             $table->unsignedBigInteger('floor_id');
 
             $table->foreign('floor_id')->references('id')->on('floors')

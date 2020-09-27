@@ -17,7 +17,7 @@ class CreateMenuSupply extends Migration
             $table->id();
             $table->unsignedBigInteger('supply_id');
             $table->unsignedBigInteger('menu_id');
-            $table->decimal('quantity',17,2);
+            $table->decimal('quantity',17,3);
 
             $table->foreign('menu_id')->references('id')->on('menus')
             ->onDelete('cascade')

@@ -3,13 +3,18 @@ import axios from 'axios'
 export const auth = {
     state: {
         pin: 0,
+        token: undefined,
         loginState: false,
         userName: '',
         userId: 0,
+        configAxios: undefined
     },
     getters: {
         getPIN: (state) => {
             return state.pin;
+        },
+        getTOKEN: (state) => {
+            return state.token;
         },
         getLOGIN_STATE: (state) => {
             return state.loginState;
@@ -19,6 +24,9 @@ export const auth = {
         },
         getUSERID: (state) => {
             return state.userId;
+        },
+        getCONFIG_AXIOS: (state) => {
+            return state.configAxios;
         },
     },
     actions: {
@@ -40,6 +48,9 @@ export const auth = {
         SET_PIN(state, value) {
             state.pin = value;
         },
+        SET_TOKEN(state, value) {
+            state.token = value;
+        },
         SET_LOGIN_STATE(state, value) {
             state.loginState = value;
         },
@@ -48,6 +59,9 @@ export const auth = {
         },
         SET_USER_ID(state, value) {
             state.userId = value;
+        },
+        SET_CONFIG_AXIOS(state, value) {
+            state.configAxios = value;
         },
     },
     modules: {}

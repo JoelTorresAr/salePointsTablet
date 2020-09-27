@@ -1,11 +1,15 @@
 export const config = {
     state: {
-        ip: 'http://192.168.0.2:7000',
+        store_id: '1',
+        cash_box_id: undefined,
         server: 0,
     },
     getters: {
-        getIP: (state) => {
-            return state.ip;
+        getSTORE_ID: (state) => {
+            return state.store_id;
+        },
+        getCASH_BOX_ID: (state) => {
+            return state.cash_box_id;
         },
         getSERVER: (state) => {
             return state.server;
@@ -13,8 +17,11 @@ export const config = {
     },
     actions: {},
     mutations: {
-        SET_IP(state, value) {
-            state.ip = value;
+        SET_STORE_ID(state, value) {
+            state.store_id = value;
+        },
+        SET_CASH_BOX_ID(state, value) {
+            state.cash_box_id = value;
         },
         SET_SERVER(state, value) {
             state.server = value;

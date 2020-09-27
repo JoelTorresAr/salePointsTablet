@@ -18,8 +18,18 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 */
-Route::group([ 'namespace' => 'Tablet'], function () {
-    Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
+
+
+Route::group(['namespace' => 'Tablet'], function () {
+
+    Route::group(['prefix' => 'auth',], function ($router) {
         Route::get('mozo', 'PinAuthController@login');
+    });
+
+    Route::group(['middleware' => ['auth:api'], 'prefix' => 'tablet'], function ($router) {
+        Route::post('mesas', 'CommandController@mesas');
+        Route::post('comanda/nueva', 'CommandController@nuevaComanda');
+        Route::post('comanda/item/agregar', 'CommandController@agregarItem');
+        Route::post('comanda/item/listar', 'CommandController@listarItemsMesa');
     });
 });
