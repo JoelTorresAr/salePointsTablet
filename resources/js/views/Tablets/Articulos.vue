@@ -257,7 +257,7 @@ export default {
       if (action == "remove") {
         cant = 0;
       }
-      if (item.print === 1 && action != "plus") {
+      if (item.print == 1 && action != "plus") {
         Swal.fire({
           title: "Advertencia!",
           text: "Esta accion solo la puede ejecutar un administrador",
@@ -265,7 +265,7 @@ export default {
           confirmButtonText: "OK"
         });
       } else {
-        var url = `${this.ip}/?nomFun=tb_item&parm_pin=${this.pin}&parm_piso=20&parm_id_mesas=${this.mesaId}&parm_id_prod=${item.idprod}&parm_cant=${cant}&parm_id_cmd=${this.mesa.id_cmd}&parm_id_mesero=${this.userID}&parm_tipo=M$`;
+        var url = `api/tablet/comanda/item/alterar`;
         axios
           .post(
             url,
@@ -291,7 +291,16 @@ export default {
             }
           })
           .catch(error => {
-            console.log(error);
+            if (error.response) {
+              if (error.response.status === 401) {
+                this.sesionCaducada();
+              }
+            } else if (error.request) {
+              // console.log(error.request);
+            } else {
+              // console.log("Error", error.message);
+            }
+            // console.log(error.config);
           });
       }
     },

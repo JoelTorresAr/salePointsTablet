@@ -101,47 +101,10 @@ class CommandController extends Controller
 
         $item = Menu::where('id', $id_prod)->first();
         if ($detalle = CommandMenu::where([['command_id', $id_cmd], ['menu_id', $id_prod]])->first()) {
-            DB::transaction(function () use ($detalle, $id_cmd, $item) {
-                $id_detalle = DB::table('command_menu')->where('id', $detalle['id'])->update(
-                    [
-                        'quantity'          => DB::raw('quantity + 1'),
-                        'sub_total'         => DB::raw('sub_total + ' . $item['sub_total']),
-                        'igv'               => DB::raw('igv + ' . $item['igv']),
-                        'total'             => DB::raw('total + ' . $item['total']),
-                    ]
-                );
-
-                $id_cmd = DB::table('commands')->where('id', $id_cmd)->update(
-                    [
-                        'subtotal'         => DB::raw('subtotal + ' . $item['sub_total']),
-                        'igv'               => DB::raw('igv + ' . $item['igv']),
-                        'total'             => DB::raw('total + ' . $item['total']),
-                    ]
-                );
-            });
+            return $this->incrementarItemDetalle($detalle['id'], $id_cmd, $item);
         } else {
-            DB::transaction(function () use ($id_cmd, $item) {
-                $id_detalle = DB::table('command_menu')->insertGetId(
-                    [
-                        'command_id'        => $id_cmd,
-                        'menu_id'           => $item['id'],
-                        'quantity'          => 1,
-                        'sub_total'         => $item['sub_total'],
-                        'igv'               => $item['igv'],
-                        'total'             => $item['total']
-                    ]
-                );
-
-                $id_cmd = DB::table('commands')->where('id', $id_cmd)->update(
-                    [
-                        'subtotal'       => $item['sub_total'],
-                        'igv'            => $item['igv'],
-                        'total'          => $item['total']
-                    ]
-                );
-            });
+            return $this->crearItemDetalle($id_cmd, $item);
         }
-        return $this->responseWithItemsInComanda($id_cmd);
     }
     public function listarItemsMesa(Request $request)
     {
@@ -156,29 +119,21 @@ class CommandController extends Controller
         $id_detalle = $request['id_detalle'];
         $cant    = $request['cantidad'];
         switch ($cant) {
-            case -1:
-                DB::transaction(function () use ($id_detalle, $id_cmd, $item) {
-                    $id_detalle = DB::table('command_menu')->where('id', $id_detalle)->update(
-                        [
-                            'quantity'          => DB::raw('quantity + 1'),
-                            'sub_total'         => DB::raw('sub_total + ' . $item['sub_total']),
-                            'igv'               => DB::raw('igv + ' . $item['igv']),
-                            'total'             => DB::raw('total + ' . $item['total']),
-                        ]
-                    );
-
-                    $id_cmd = DB::table('commands')->where('id', $id_cmd)->update(
-                        [
-                            'subtotal'         => DB::raw('subtotal + ' . $item['sub_total']),
-                            'igv'               => DB::raw('igv + ' . $item['igv']),
-                            'total'             => DB::raw('total + ' . $item['total']),
-                        ]
-                    );
-                });
+            case 1:
+                return $this->incrementarItemDetalle($id_detalle, $id_cmd, $item);
+                break;
+            case 0:
+                $detalle = CommandMenu::where('id', $id_detalle)->first();
+                return $this->eliminarItemDetalle($detalle, $id_cmd);
                 break;
 
             default:
-                # code...
+                $detalle = CommandMenu::where('id', $id_detalle)->first();
+                if ($detalle->quantity == 1) {
+                    return $this->eliminarItemDetalle($detalle, $id_cmd);
+                } else {
+                    return $this->disminuirItemDetalle($id_detalle, $id_cmd, $item);
+                }
                 break;
         }
     }
@@ -201,6 +156,88 @@ class CommandController extends Controller
 
         return response()->json(['msg' =>  'Ok', 'prod' => $items, 'status' => 1], 200);
     }
+    protected function crearItemDetalle($id_cmd, $item)
+    {
+        DB::beginTransaction();
+        try {
+           .
+           
+
+            DB::table('commands')->where('id', $id_cmd)->update(
+                [
+                    'subtotal'       => $item['sub_total'],
+                    'igv'            => $item['igv'],
+                    'total'          => $item['total']
+                ]
+            );
+
+            DB::commit();
+            return $this->responseWithItemsInComanda($id_cmd);
+            // all good
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['msg' =>  'Ok', 'prod' => $e, 'status' => 0], 200);
+            // something went wrong
+        }
+    }
+    protected function incrementarItemDetalle($id_detalle, $id_cmd, $item)
+    {
+        DB::beginTransaction();
+        try {
+            DB::table('command_menu')->where('id', $id_detalle)->update(
+                [
+                    'quantity'          => DB::raw('quantity + 1'),
+                    'sub_total'         => DB::raw('sub_total + ' . $item['sub_total']),
+                    'igv'               => DB::raw('igv + ' . $item['igv']),
+                    'total'             => DB::raw('total + ' . $item['total']),
+                ]
+            );
+
+            DB::table('commands')->where('id', $id_cmd)->update(
+                [
+                    'subtotal'         => DB::raw('subtotal + ' . $item['sub_total']),
+                    'igv'               => DB::raw('igv + ' . $item['igv']),
+                    'total'             => DB::raw('total + ' . $item['total']),
+                ]
+            );
+
+            DB::commit();
+            return $this->responseWithItemsInComanda($id_cmd);
+            // all good
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['msg' =>  'Ok', 'prod' => $e, 'status' => 0], 200);
+        }
+    }
+    protected function disminuirItemDetalle($id_detalle, $id_cmd, $item)
+    {
+        DB::beginTransaction();
+        try {
+            DB::table('command_menu')->where('id', $id_detalle)->update(
+                [
+                    'quantity'          => DB::raw('quantity - 1'),
+                    'sub_total'         => DB::raw('sub_total - ' . $item['sub_total']),
+                    'igv'               => DB::raw('igv - ' . $item['igv']),
+                    'total'             => DB::raw('total - ' . $item['total']),
+                ]
+            );
+
+            DB::table('commands')->where('id', $id_cmd)->update(
+                [
+                    'subtotal'         => DB::raw('subtotal - ' . $item['sub_total']),
+                    'igv'               => DB::raw('igv - ' . $item['igv']),
+                    'total'             => DB::raw('total - ' . $item['total']),
+                ]
+            );
+
+            DB::commit();
+            return $this->responseWithItemsInComanda($id_cmd);
+            // all good
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['msg' =>  'Ok', 'prod' => $e, 'status' => 0], 200);
+        }
+    }
     protected function eliminarItemDetalle($detalle, $id_cmd)
     {
         DB::beginTransaction();
@@ -217,39 +254,11 @@ class CommandController extends Controller
 
             DB::commit();
             // all good
+            return $this->responseWithItemsInComanda($id_cmd);
         } catch (\Exception $e) {
             DB::rollback();
             // something went wrong
-        }
-    }
-    protected function crearItemDetalle($id_cmd,$item)
-    {
-        DB::beginTransaction();
-        try {
-            $id_detalle = DB::table('command_menu')->insertGetId(
-                [
-                    'command_id'        => $id_cmd,
-                    'menu_id'           => $item['id'],
-                    'quantity'          => 1,
-                    'sub_total'         => $item['sub_total'],
-                    'igv'               => $item['igv'],
-                    'total'             => $item['total']
-                ]
-            );
-
-            $id_cmd = DB::table('commands')->where('id', $id_cmd)->update(
-                [
-                    'subtotal'       => $item['sub_total'],
-                    'igv'            => $item['igv'],
-                    'total'          => $item['total']
-                ]
-            );
-
-            DB::commit();
-            // all good
-        } catch (\Exception $e) {
-            DB::rollback();
-            // something went wrong
+            return response()->json(['msg' =>  'Ok', 'prod' => $e, 'status' => 0], 200);
         }
     }
 }

@@ -270,7 +270,7 @@ __webpack_require__.r(__webpack_exports__);
         cant = 0;
       }
 
-      if (item.print === 1 && action != "plus") {
+      if (item.print == 1 && action != "plus") {
         Swal.fire({
           title: "Advertencia!",
           text: "Esta accion solo la puede ejecutar un administrador",
@@ -278,7 +278,7 @@ __webpack_require__.r(__webpack_exports__);
           confirmButtonText: "OK"
         });
       } else {
-        var url = "".concat(this.ip, "/?nomFun=tb_item&parm_pin=").concat(this.pin, "&parm_piso=20&parm_id_mesas=").concat(this.mesaId, "&parm_id_prod=").concat(item.idprod, "&parm_cant=").concat(cant, "&parm_id_cmd=").concat(this.mesa.id_cmd, "&parm_id_mesero=").concat(this.userID, "&parm_tipo=M$");
+        var url = "api/tablet/comanda/item/alterar";
         axios.post(url, {
           id_mesa: this.mesaId,
           id_producto: item.idprod,
@@ -299,7 +299,14 @@ __webpack_require__.r(__webpack_exports__);
             });
           }
         })["catch"](function (error) {
-          console.log(error);
+          if (error.response) {
+            if (error.response.status === 401) {
+              _this4.sesionCaducada();
+            }
+          } else if (error.request) {// console.log(error.request);
+          } else {// console.log("Error", error.message);
+            } // console.log(error.config);
+
         });
       }
     },

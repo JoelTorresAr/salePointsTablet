@@ -31,5 +31,6 @@ Route::group(['namespace' => 'Tablet'], function () {
         Route::post('comanda/nueva', 'CommandController@nuevaComanda');
         Route::post('comanda/item/agregar', 'CommandController@agregarItem');
         Route::post('comanda/item/listar', 'CommandController@listarItemsMesa');
+        Route::post('comanda/item/alterar', 'CommandController@alterarLista');
     });
 });

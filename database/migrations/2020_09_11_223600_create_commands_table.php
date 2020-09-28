@@ -37,12 +37,8 @@ class CreateCommandsTable extends Migration
             $table->unsignedBigInteger('invoice_id')->nullable();
             $table->string('serie',8)->nullable();
             $table->string('number',8)->nullable();
-            $table->unsignedBigInteger('pay_type_id')->nullable();
 
             $table->foreign('editing_by_id')->references('id')->on('users')
-            ->onDelete('cascade')
-            ->onUpdate('cascade');
-            $table->foreign('pay_type_id')->references('id')->on('pay_types')
             ->onDelete('cascade')
             ->onUpdate('cascade');
             $table->foreign('command_type_id')->references('id')->on('command_types')

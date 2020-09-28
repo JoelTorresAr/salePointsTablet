@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCommandMenu extends Migration
+class CreateCommandPaytypeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,21 +13,18 @@ class CreateCommandMenu extends Migration
      */
     public function up()
     {
-        Schema::create('command_menu', function (Blueprint $table) {
+        Schema::create('command_paytype', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('command_id');
-            $table->unsignedBigInteger('menu_id');
-            $table->integer('quantity');
-            $table->decimal('sub_total',17,2);
-            $table->decimal('igv',17,2);
-            $table->decimal('total',17,2);
-            $table->string('state',1)->default('A');
-            $table->string('print_status',1)->default(0);
+            $table->unsignedBigInteger('paytype_id');            
+            $table->decimal('payment_with',17,3);
+            $table->decimal('change',17,3)->default(0);
 
+            
             $table->foreign('command_id')->references('id')->on('commands')
             ->onDelete('cascade')
             ->onUpdate('cascade');
-            $table->foreign('menu_id')->references('id')->on('menus')
+            $table->foreign('paytype_id')->references('id')->on('pay_types')
             ->onDelete('cascade')
             ->onUpdate('cascade');
         });
@@ -40,8 +37,6 @@ class CreateCommandMenu extends Migration
      */
     public function down()
     {
-        Schema::disableForeignKeyConstraints();
-        Schema::dropIfExists('command_menu');
-        Schema::enableForeignKeyConstraints();
+        Schema::dropIfExists('command_paytype');
     }
 }
