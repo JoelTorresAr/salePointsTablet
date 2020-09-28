@@ -25,16 +25,6 @@ class CommandController extends Controller
 
     public function mesas(Request $request)
     {
-
-        /* $tables = Table::with('command')->where([['floor_id', $request['piso']], ['state', 'A']])
-            ->select(
-                'tables.id as id',
-                'tables.name as nombre',
-                'tables.status as st_mesa',
-                'tables.joined as juntada',
-                'tables.order_status as orden',
-            )->get();*/
-
         $tables = DB::table('tables')
             ->leftJoin('commands', 'commands.id', '=', 'tables.command_id')
             ->where([['tables.floor_id', $request['piso']], ['tables.state', 'A']])
@@ -160,8 +150,16 @@ class CommandController extends Controller
     {
         DB::beginTransaction();
         try {
-           .
-           
+            DB::table('command_menu')->insertGetId(
+                [
+                    'command_id'        => $id_cmd,
+                    'menu_id'           => $item['id'],
+                    'quantity'          => 1,
+                    'sub_total'         => $item['sub_total'],
+                    'igv'               => $item['igv'],
+                    'total'             => $item['total']
+                ]
+            );
 
             DB::table('commands')->where('id', $id_cmd)->update(
                 [
