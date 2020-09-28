@@ -129,6 +129,7 @@ class CommandController extends Controller
     }
     protected function responseWithItemsInComanda($id_cmd)
     {
+        $command = Command::where('id', $id_cmd)->first();
         $items = DB::table('command_menu')
             ->leftJoin('menus', 'menus.id', '=', 'command_menu.menu_id')
             ->where([['command_menu.command_id', $id_cmd], ['command_menu.state', 'A']])
@@ -144,7 +145,7 @@ class CommandController extends Controller
             //->whereNull('commands.admin_id')
             ->get();
 
-        return response()->json(['msg' =>  'Ok', 'prod' => $items, 'status' => 1], 200);
+        return response()->json(['msg' =>  'Ok', 'prod' => $items, 'status' => 1,'total' => $command['total']], 200);
     }
     protected function crearItemDetalle($id_cmd, $item)
     {
@@ -163,9 +164,9 @@ class CommandController extends Controller
 
             DB::table('commands')->where('id', $id_cmd)->update(
                 [
-                    'subtotal'       => $item['sub_total'],
-                    'igv'            => $item['igv'],
-                    'total'          => $item['total']
+                    'subtotal'         => DB::raw('subtotal + ' . $item['sub_total']),
+                    'igv'               => DB::raw('igv + ' . $item['igv']),
+                    'total'             => DB::raw('total + ' . $item['total']),
                 ]
             );
 
