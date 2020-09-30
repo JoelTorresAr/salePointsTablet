@@ -181,6 +181,7 @@ __webpack_require__.r(__webpack_exports__);
         var data = _ref.data;
 
         if (data.msg == "Ok") {
+          console.log(data.prod);
           _this.articlesEnMesa = data.prod;
           _this.total = data.total;
         } else {
@@ -331,9 +332,12 @@ __webpack_require__.r(__webpack_exports__);
     sendKitchen: function sendKitchen() {
       var _this5 = this;
 
-      var url = "".concat(this.ip, "/?nomFun=tb_enviar_cmd&parm_pin=").concat(this.pin, "&parm_piso=20&parm_id_mesas=").concat(this.mesaId, "&parm_id_cmd=").concat(this.mesa.id_cmd, "&parm_id_mesero=").concat(this.userID, "&parm_tipo=M$"); //console.log(url)
+      var url = "api/tablet/comanda/imprimir/cocina"; //console.log(url)
 
-      axios.get(url).then(function (_ref5) {
+      axios.post(url, {
+        id_mesa: this.mesaId,
+        mesa: this.mesa.nombre
+      }, this.config).then(function (_ref5) {
         var data = _ref5.data;
 
         if (data.msg == "OK") {

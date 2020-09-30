@@ -166,6 +166,7 @@ export default {
         )
         .then(({ data }) => {
           if (data.msg == "Ok") {
+            console.log(data.prod);
             this.articlesEnMesa = data.prod;
             this.total = data.total;
           } else {
@@ -321,10 +322,17 @@ export default {
       }
     },
     sendKitchen() {
-      var url = `${this.ip}/?nomFun=tb_enviar_cmd&parm_pin=${this.pin}&parm_piso=20&parm_id_mesas=${this.mesaId}&parm_id_cmd=${this.mesa.id_cmd}&parm_id_mesero=${this.userID}&parm_tipo=M$`;
+      var url = `api/tablet/comanda/imprimir/cocina`;
       //console.log(url)
       axios
-        .get(url)
+        .post(
+          url,
+          {
+            id_mesa: this.mesaId,
+            mesa: this.mesa.nombre,
+          },
+          this.config
+        )
         .then(({ data }) => {
           if (data.msg == "OK") {
             Swal.fire({

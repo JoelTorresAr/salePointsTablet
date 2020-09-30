@@ -22,6 +22,8 @@ class CreateCommandMenu extends Migration
             $table->decimal('igv',17,2);
             $table->decimal('total',17,2);
             $table->string('state',1)->default('A');
+            $table->integer('original_quantity')->default(0);
+            $table->integer('increment')->default(0);
             $table->string('print_status',1)->default(0);
 
             $table->foreign('command_id')->references('id')->on('commands')
