@@ -32,6 +32,8 @@ Route::group(['namespace' => 'Tablet'], function () {
         Route::post('comanda/item/agregar', 'CommandController@agregarItem');
         Route::post('comanda/item/listar', 'CommandController@listarItemsMesa');
         Route::post('comanda/item/alterar', 'CommandController@alterarLista');
-        Route::post('comanda/imprimir/cocina', 'TicketController@imprimirCocina');
+        Route::post('comanda/liberar', 'CommandController@liberar');
+        Route::post('comanda/imprimir/cocina', 'TicketController@cocina');
+        Route::post('comanda/imprimir/precuenta', 'TicketController@precuenta');
     });
 });

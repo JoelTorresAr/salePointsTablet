@@ -44,6 +44,12 @@ class CommandController extends Controller
 
         return response()->json(['mesas' =>  $tables], 200);
     }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return 
+     */
     public function nuevaComanda(Request $request)
     {
         $id_mesa = $request['id'];
@@ -77,10 +83,35 @@ class CommandController extends Controller
             });
             return response()->json(['msg' =>  'OK', 'status' => 1], 200);
         } else {
-            if ($comanda = Command::where('id', $mesa['command_id'])->first()) {
+            $comanda = Command::where('id', $mesa['command_id'])->first();
+            if ($comanda->state == 3) {
+                return response()->json(['msg' => 'La comanda ya fue enviado a precuenta', 'status' => 0], 200);
+            }
+            if ($comanda->editing_by_id != null) {
+                /**
+                 * La comanda existe y esta siendo atendida
+                 */
                 return response()->json(['msg' =>  'Comanda esta siendo Editada por mesero: ' . $comanda['editing_by_name'], 'status' => 0], 200);
             } else {
-                return response()->json(['msg' =>  'Comanda no existe', 'status' => 0], 200);
+                /**
+                 * Existe la comanda pero nadie la esta atendiendo
+                 */
+                DB::beginTransaction();
+                try {
+                    DB::table('commands')->where('id', $mesa['command_id'])->update(
+                        [
+                            'editing_by_id'     => $mozo['id'],
+                            'editing_by_name'   => $mozo['name'],
+                        ]
+                    );
+
+                    DB::commit();
+                    return response()->json(['msg' =>  'OK', 'status' => 1], 200);
+                    // all good
+                } catch (\Exception $e) {
+                    DB::rollback();
+                    return response()->json(['msg' =>  $e, 'status' => 0], 200);
+                }
             }
         }
     }
@@ -145,7 +176,7 @@ class CommandController extends Controller
             //->whereNull('commands.admin_id')
             ->get();
 
-        return response()->json(['msg' =>  'Ok', 'prod' => $items, 'status' => 1,'total' => $command['total']], 200);
+        return response()->json(['msg' =>  'Ok', 'prod' => $items, 'status' => 1, 'total' => $command['total']], 200);
     }
     protected function crearItemDetalle($id_cmd, $item)
     {
@@ -186,6 +217,7 @@ class CommandController extends Controller
             DB::table('command_menu')->where('id', $id_detalle)->update(
                 [
                     'quantity'          => DB::raw('quantity + 1'),
+                    'increment'         => DB::raw('increment + 1'),
                     'sub_total'         => DB::raw('sub_total + ' . $item['sub_total']),
                     'igv'               => DB::raw('igv + ' . $item['igv']),
                     'total'             => DB::raw('total + ' . $item['total']),
@@ -215,6 +247,7 @@ class CommandController extends Controller
             DB::table('command_menu')->where('id', $id_detalle)->update(
                 [
                     'quantity'          => DB::raw('quantity - 1'),
+                    'increment'         => DB::raw('increment - 1'),
                     'sub_total'         => DB::raw('sub_total - ' . $item['sub_total']),
                     'igv'               => DB::raw('igv - ' . $item['igv']),
                     'total'             => DB::raw('total - ' . $item['total']),
@@ -248,8 +281,15 @@ class CommandController extends Controller
                     'total'             => DB::raw('total - ' . $detalle['total']),
                 ]
             );
-
-            DB::table('command_menu')->where('id', $detalle['id'])->delete();
+            if ($detalle['print_status'] == 1) {
+                DB::table('command_menu')->where('id', $detalle['id'])->update(
+                    [
+                        'state'          => 'E',
+                    ]
+                );
+            } else {
+                DB::table('command_menu')->where('id', $detalle['id'])->delete();
+            }
 
             DB::commit();
             // all good
@@ -258,6 +298,26 @@ class CommandController extends Controller
             DB::rollback();
             // something went wrong
             return response()->json(['msg' =>  'Ok', 'prod' => $e, 'status' => 0], 200);
+        }
+    }
+    public function liberar(Request $request)
+    {
+        $mesa = Table::where('id', $request->id_mesa)->first();
+        DB::beginTransaction();
+        try {
+            DB::table('commands')->where('id', $mesa['command_id'])->update(
+                [
+                    'editing_by_id'    => null,
+                    'editing_by_name'  => null,
+                ]
+            );
+
+            DB::commit();
+            return response()->json(['msg' =>  'Ok', 'status' => 1], 200);
+            // all good
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['msg' =>  $e, 'status' => 0], 200);
         }
     }
 }

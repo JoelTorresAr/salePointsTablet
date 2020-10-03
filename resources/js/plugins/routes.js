@@ -10,7 +10,7 @@ const routes = [{
     component: () =>
         import("../views/Tablets/Login.vue"),
     meta: {
-        //middleware: [Middlewares.guest]
+        middleware: [Middlewares.guest]
     }
 }, {
     path: "/",
@@ -18,7 +18,7 @@ const routes = [{
     component: () =>
         import("../views/Tablets/Index.vue"),
     meta: {
-        //middleware: [Middlewares.auth]
+        middleware: [Middlewares.auth]
     },
 },
 {

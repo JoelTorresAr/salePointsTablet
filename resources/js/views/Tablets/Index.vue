@@ -241,7 +241,7 @@ export default {
           icon = "fas fa-coins";
           break;
 
-        case "4":
+        case "2":
           //Esta en preparción
           icon = "mdi mdi-pot-steam";
           break;
@@ -660,6 +660,7 @@ export default {
         icon: "warning",
         confirmButtonText: "OK"
       });
+      this.$store.commit("SET_PIN", null);
       this.$router.push({ name: "Login" });
     }
   }

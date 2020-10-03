@@ -260,7 +260,7 @@ __webpack_require__.r(__webpack_exports__);
           icon = "fas fa-coins";
           break;
 
-        case "4":
+        case "2":
           //Esta en preparción
           icon = "mdi mdi-pot-steam";
           break;
@@ -739,6 +739,7 @@ __webpack_require__.r(__webpack_exports__);
         icon: "warning",
         confirmButtonText: "OK"
       });
+      this.$store.commit("SET_PIN", null);
       this.$router.push({
         name: "Login"
       });

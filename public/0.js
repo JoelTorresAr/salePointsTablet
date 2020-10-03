@@ -334,9 +334,12 @@ __webpack_require__.r(__webpack_exports__);
 
       var url = "api/tablet/comanda/imprimir/cocina"; //console.log(url)
 
+      var user = this.$store.getters.getUSERNAME;
       axios.post(url, {
         id_mesa: this.mesaId,
-        mesa: this.mesa.nombre
+        mesa: this.mesa.nombre,
+        mozo: user,
+        tipo: 'cocina'
       }, this.config).then(function (_ref5) {
         var data = _ref5.data;
 
@@ -358,22 +361,33 @@ __webpack_require__.r(__webpack_exports__);
           });
         }
       })["catch"](function (error) {
-        console.log(error);
+        if (error.response) {
+          if (error.response.status === 401) {
+            _this5.sesionCaducada();
+          }
+        }
       });
     },
     sendPrecuenta: function sendPrecuenta() {
       var _this6 = this;
 
-      var url = "".concat(this.ip, "/?nomFun=tb_cobrar_mesa&parm_pin=").concat(this.pin, "&parm_piso=20&parm_id_mesas=").concat(this.mesaId, "&parm_id_cmd=").concat(this.mesa.id_cmd, "&parm_dade=1&parm_id_mesero=").concat(this.userID, "&parm_tipo=M$");
-      axios.get(url).then(function (_ref6) {
+      var url = "api/tablet/comanda/imprimir/precuenta";
+      var user = this.$store.getters.getUSERNAME;
+      axios.post(url, {
+        id_mesa: this.mesaId,
+        mesa: this.mesa.nombre,
+        mozo: user,
+        tipo: 'precuenta'
+      }, this.config).then(function (_ref6) {
         var data = _ref6.data;
 
-        if (data.msg == "Ok") {
-          //this.$store.dispatch("BREAK");
-          _this6.articlesEnMesa = data.prod;
-          _this6.total = data.total;
+        if (data.msg == "OK") {
+          _this6.$router.push({
+            name: "Home"
+          });
 
-          _this6.salir();
+          _this6.articlesEnMesa = data.prod;
+          _this6.total = data.total; // this.salir();
         } else {
           Swal.fire({
             title: "Advertencia!",
@@ -383,14 +397,20 @@ __webpack_require__.r(__webpack_exports__);
           });
         }
       })["catch"](function (error) {
-        console.log(error);
+        if (error.response) {
+          if (error.response.status === 401) {
+            _this6.sesionCaducada();
+          }
+        }
       });
     },
     salir: function salir() {
       var _this7 = this;
 
-      var url = "".concat(this.ip, "/?nomFun=tb_des_cmd&parm_pin=").concat(this.pin, "&parm_id_cmd=").concat(this.mesa.id_cmd, "&parm_id_mesero=").concat(this.userID, "&parm_tipo=M$");
-      axios.get(url).then(function (_ref7) {
+      var url = "api/tablet/comanda/liberar";
+      axios.post(url, {
+        id_mesa: this.mesaId
+      }, this.config).then(function (_ref7) {
         var data = _ref7.data;
 
         if (data.msg == "Ok") {
@@ -422,6 +442,7 @@ __webpack_require__.r(__webpack_exports__);
         icon: "warning",
         confirmButtonText: "OK"
       });
+      this.$store.commit("SET_PIN", null);
       this.$router.push({
         name: "Login"
       });
