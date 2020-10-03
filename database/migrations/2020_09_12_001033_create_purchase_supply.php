@@ -18,6 +18,7 @@ class CreatePurchaseSupply extends Migration
             $table->unsignedBigInteger('purchase_id');
             $table->unsignedBigInteger('supply_id');
             $table->decimal('quantity',17,2);
+            $table->decimal('weight',17,3);
             $table->decimal('price',17,2);
             $table->decimal('sub_total',17,2);
 
