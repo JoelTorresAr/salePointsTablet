@@ -27,7 +27,6 @@ class CreateCommandsTable extends Migration
             $table->unsignedBigInteger('editing_by_id')->nullable();
             $table->string('editing_by_name')->nullable();
             $table->decimal('payment_with',17,2)->default(0);
-            $table->text('command_note')->nullable();
             $table->string('state',1)->nullable()->default(1);
             $table->string('edit_status')->default('O');
             $table->decimal('subtotal',17,4)->default(0);

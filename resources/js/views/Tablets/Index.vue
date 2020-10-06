@@ -424,38 +424,6 @@ export default {
           if (this.showJoins & (st_cmd != "3") & (st_cmd != "4")) {
             std = true;
           }
-          /*           var existewithCmd = false;
-          var existewithoutCmd = false;
-          var ixwith;
-          var ixwithout;
-          this.arrayMesas.forEach(e => {
-            if ((e.id == index) & (e.id_cmd === "")) {
-              existewithoutCmd = true;
-              ixwithout = e;
-            }
-            if ((e.id == index) & (e.id_cmd !== "")) {
-              existewithCmd = true;
-              ixwith = e;
-            }
-          });
-          if (
-            this.showJoins &
-            (st_cmd != "3") &
-            (st_cmd != "4") &
-            !existewithCmd
-          ) {
-            console.log("mesa sin comanda");
-            std = true;
-          }
-          if (
-            this.showJoins &
-            (st_cmd != "3") &
-            (st_cmd != "4") &
-            !existewithoutCmd
-          ) {
-            console.log("mesa con comanda");
-            std = true;
-          } */
           break;
 
         default:

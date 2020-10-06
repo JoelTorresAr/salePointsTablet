@@ -18,7 +18,7 @@ class CreateCommandPaytypeTable extends Migration
             $table->unsignedBigInteger('command_id');
             $table->unsignedBigInteger('paytype_id');            
             $table->decimal('payment_with',17,3);
-            $table->decimal('change',17,3)->default(0);
+            $table->decimal('change_cp',17,3)->default(0);
 
             
             $table->foreign('command_id')->references('id')->on('commands')

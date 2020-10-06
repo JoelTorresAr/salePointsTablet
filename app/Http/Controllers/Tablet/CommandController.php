@@ -115,6 +115,28 @@ class CommandController extends Controller
             }
         }
     }
+    public function agregarNota(Request $request)
+    {
+        $id_cmd = Table::where('id', $request['id_mesa'])->value('command_id');
+        $nota = $request['nota'];
+
+            DB::beginTransaction();
+            try {
+                DB::table('notes')->insertGetId(
+                    [
+                        'command_id'   => $id_cmd,
+                        'note'         => $nota,
+                    ]
+                );
+
+                DB::commit();
+                return response()->json(['msg' =>  'OK', 'status' => 1], 200);
+                // all good
+            } catch (\Exception $e) {
+                DB::rollback();
+                return response()->json(['msg' =>  $e, 'status' => 0], 200);
+            }
+    }
     public function agregarItem(Request $request)
     {
         $id_cmd = Table::where('id', $request['id_mesa'])->value('command_id');
@@ -272,7 +294,7 @@ class CommandController extends Controller
             // all good
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['msg' =>  'Ok', 'prod' => $e, 'status' => 0], 200);
+            return response()->json(['msg' =>  $e, 'status' => 0], 200);
         }
     }
     protected function eliminarItemDetalle($detalle, $id_cmd)
@@ -302,7 +324,7 @@ class CommandController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             // something went wrong
-            return response()->json(['msg' =>  'Ok', 'prod' => $e, 'status' => 0], 200);
+            return response()->json(['msg' =>  $e, 'status' => 0], 200);
         }
     }
     public function liberar(Request $request)

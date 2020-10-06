@@ -228,14 +228,22 @@ export default {
         });
     },
     addNote() {
-      var url = `${this.ip}/?nomFun=tb_new_notacmd&parm_pin=${this.pin}&parm_piso=20&parm_id_mesas=${this.mesaId}&parm_id_cmd=${this.mesa.id_cmd}&parm_id_mesero=${this.userID}&parm_nota=${this.noteCmd}&parm_tipo=M$`;
+      var url = `api/tablet/comanda/nota`;
       axios
-        .get(url)
+        .post(
+          url,
+          {
+            id_mesa: this.mesaId,
+            nota: this.noteCmd
+          },
+          this.config
+        )
         .then(({ data }) => {
           this.dialog = false;
           if (data.msg == "OK") {
             this.noteCmd = "";
           } else {
+            console.log(data);
             this.noteCmd = "";
             Swal.fire({
               title: "Advertencia!",
@@ -299,6 +307,12 @@ export default {
               // console.log(error.request);
             } else {
               // console.log("Error", error.message);
+              Swal.fire({
+                title: "Advertencia!",
+                text: error.message.msg,
+                icon: "warning",
+                confirmButtonText: "OK"
+              });
             }
             // console.log(error.config);
           });

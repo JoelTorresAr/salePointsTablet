@@ -237,14 +237,18 @@ __webpack_require__.r(__webpack_exports__);
     addNote: function addNote() {
       var _this3 = this;
 
-      var url = "".concat(this.ip, "/?nomFun=tb_new_notacmd&parm_pin=").concat(this.pin, "&parm_piso=20&parm_id_mesas=").concat(this.mesaId, "&parm_id_cmd=").concat(this.mesa.id_cmd, "&parm_id_mesero=").concat(this.userID, "&parm_nota=").concat(this.noteCmd, "&parm_tipo=M$");
-      axios.get(url).then(function (_ref3) {
+      var url = "api/tablet/comanda/nota";
+      axios.post(url, {
+        id_mesa: this.mesaId,
+        nota: this.noteCmd
+      }, this.config).then(function (_ref3) {
         var data = _ref3.data;
         _this3.dialog = false;
 
         if (data.msg == "OK") {
           _this3.noteCmd = "";
         } else {
+          console.log(data);
           _this3.noteCmd = "";
           Swal.fire({
             title: "Advertencia!",
@@ -304,8 +308,15 @@ __webpack_require__.r(__webpack_exports__);
               _this4.sesionCaducada();
             }
           } else if (error.request) {// console.log(error.request);
-          } else {// console.log("Error", error.message);
-            } // console.log(error.config);
+          } else {
+            // console.log("Error", error.message);
+            Swal.fire({
+              title: "Advertencia!",
+              text: error.message.msg,
+              icon: "warning",
+              confirmButtonText: "OK"
+            });
+          } // console.log(error.config);
 
         });
       }

@@ -33,6 +33,10 @@ class TicketController extends Controller
             ->orderBy('command_menu.id')
             //->whereNull('commands.admin_id')
             ->get();
+        $notes = DB::table('notes')
+            ->where([['notes.command_id', $id_cmd], ['notes.print_state', 0]])
+            ->orderBy('notes.id')
+            ->get();
         $detalles_sin_imprimir = 0;
         $detalles_alterados = 0;
         foreach ($items as $key => $value) {
@@ -43,46 +47,13 @@ class TicketController extends Controller
                 $detalles_alterados++;
             }
         };
-        $detalles = ['mesa' => $request->mesa];
+        $detalles = ['mesa' => $request->mesa,'notas'=>$notes];
 
         //Verifica que la comanda tenga detalles
         if ($detalles_sin_imprimir == 0 && $detalles_alterados == 0) {
             return response()->json(['msg' => 'No hay nada que enviar a cocina', 'status' => 0], 200);
         } else {
             return $this->imprimirCocina($items, $id_cmd, $mozo, $detalles);
-        }
-    }
-    public function notas(Request $request)
-    {
-        $mozo = $request['mozo'];
-        $nota = $request['nota'];
-        $id_cmd = Table::where('id', $request['id_mesa'])->value('command_id');
-        $items = DB::table('command_menu')
-            ->leftJoin('menus', 'menus.id', '=', 'command_menu.menu_id')
-            ->where([['command_menu.command_id', $id_cmd], ['command_menu.state', 'A']])
-            ->select(
-                'command_menu.id as id',
-                'command_menu.quantity as cant',
-                'command_menu.original_quantity as original',
-                'command_menu.increment as increment',
-                'command_menu.print_status as print',
-                'menus.id as idprod',
-                'menus.name as name',
-            )
-            ->orderBy('command_menu.id')
-            //->whereNull('commands.admin_id')
-            ->get();
-        $cant_item = 0;
-        foreach ($items as $key => $value) {
-            $cant_item++;
-        };
-        $detalles = ['mesa' => $request->mesa,'nota'=>$nota];
-
-        //Verifica que la comanda tenga detalles
-        if ($cant_item == 0) {
-            return response()->json(['msg' => 'No hay nada que enviado a cocina', 'status' => 0], 200);
-        } else {
-            return $this->imprimirNota($items, $id_cmd, $mozo, $detalles);
         }
     }
 
@@ -130,6 +101,11 @@ class TicketController extends Controller
             DB::table('commands')->where('id', $id_cmd)->update(
                 [
                     'state'      => 2,
+                ]
+            );
+            DB::table('notes')->where('command_id', $id_cmd)->update(
+                [
+                    'print_state'      => 1,
                 ]
             );
 
@@ -184,93 +160,9 @@ class TicketController extends Controller
                     }
                     $impresora->feed(1);
                 }
-
-                $impresora->feed(1);
-                // Pie de pagina
-                /*
                 $impresora->setJustification(Printer::JUSTIFY_LEFT);
-                $impresora->setTextSize(1, 1);
-                $impresora->text("Fecha-Hora: " . $date_time);
-                $impresora->feed(1);*/
-            } catch (\Throwable $th) {
-                DB::rollback();
-                return response()->json(['msg' => $th, 'status' => 0, 'tipo' => 'tikect'], 200);
-            } finally {
-                $impresora->cut();
-                $impresora->close();
-            };
-            DB::commit();
-            return response()->json(['msg' => 'OK', 'status' => 1], 200);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['msg' => $e, 'status' => 0, 'tipo' => 'db'], 200);
-        }
-    }
-    protected function imprimirNota($items, $id_cmd, $mozo, $detalles)
-    {
-        DB::beginTransaction();
-        try {
-            DB::table('command_menu')->where('command_id', $id_cmd)->update(
-                [
-                    'print_status'      => 1,
-                    'increment'         => 0,
-                ]
-            );
-            DB::table('commands')->where('id', $id_cmd)->update(
-                [
-                    'state'      => 2,
-                ]
-            );
-
-            try {
-
-                $date_time = Carbon::now('America/Lima')->toDateTimeString();
-                // Configuracion de conexion
-                $nombreImpresora = "Cocina";
-                $connector = new WindowsPrintConnector($nombreImpresora);
-                $impresora = new Printer($connector);
-                // Cabecera de ticket
-                $impresora->setDoubleStrike(false);
-                $impresora->setJustification(Printer::JUSTIFY_CENTER);
-                $impresora->setTextSize(8, 8);
-                $impresora->setFont(Printer::FONT_B);
-                $impresora->text("COCINA \n");
-                $impresora->setTextSize(4, 4);
-                $impresora->setFont(Printer::FONT_B);
-                $impresora->text($detalles['mesa'] . "\n");
-                //Detalle
-                $impresora->setJustification(Printer::JUSTIFY_LEFT);
-                $impresora->setEmphasis(true);
-                $impresora->setTextSize(2, 2);
-                $impresora->text("MOZO: " . $mozo . "\n");
-                $impresora->text("Fecha-Hora: " . $date_time . "\n");
-                $impresora->feed(1);
-                $impresora->setJustification(Printer::JUSTIFY_RIGHT);
-                $impresora->text(new itemCocina('PRODUCTO', 'CANT'));
-                $impresora->setJustification(Printer::JUSTIFY_CENTER);
-                $impresora->text("******************************\n");
-                $impresora->feed(2);
-                //Items
-                $impresora->setEmphasis(false);
-                $impresora->setJustification(Printer::JUSTIFY_RIGHT);
-                foreach ($items as $key => $value) {
-                    $std_imp = $value->print;
-                    $nombre = $value->name;
-                    $cant   =  $value->cant;
-                    $incremento = $value->increment;
-                    if ($std_imp == 0) {
-                        $impresora->text(new itemCocina($nombre, $cant));
-                    } else {
-                        if ($incremento != 0) {
-                            $signo = $incremento <=> 0;
-                            if ($signo == -1) {
-                                $impresora->text(new itemCocina($nombre . " (" . "-" . $incremento . ")", $cant));
-                            }
-                            if ($signo == 1) {
-                                $impresora->text(new itemCocina($nombre . " (" . "+" . $incremento . ")", $cant));
-                            }
-                        }
-                    }
+                foreach ($detalles['notas'] as $key => $value) {
+                    $impresora->text("Nota: ".$value->note."\n");
                     $impresora->feed(1);
                 }
 
