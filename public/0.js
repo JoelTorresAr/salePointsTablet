@@ -181,7 +181,6 @@ __webpack_require__.r(__webpack_exports__);
         var data = _ref.data;
 
         if (data.msg == "Ok") {
-          console.log(data.prod);
           _this.articlesEnMesa = data.prod;
           _this.total = data.total;
         } else {
@@ -271,7 +270,7 @@ __webpack_require__.r(__webpack_exports__);
         cant = 0;
       }
 
-      if (item.print == 1 && action != "plus") {
+      if (item.print == 1 && action != "plus" && item.increment < 1) {
         Swal.fire({
           title: "Advertencia!",
           text: "Esta accion solo la puede ejecutar un administrador",
@@ -339,7 +338,7 @@ __webpack_require__.r(__webpack_exports__);
         id_mesa: this.mesaId,
         mesa: this.mesa.nombre,
         mozo: user,
-        tipo: 'cocina'
+        tipo: "cocina"
       }, this.config).then(function (_ref5) {
         var data = _ref5.data;
 
@@ -371,38 +370,54 @@ __webpack_require__.r(__webpack_exports__);
     sendPrecuenta: function sendPrecuenta() {
       var _this6 = this;
 
-      var url = "api/tablet/comanda/imprimir/precuenta";
-      var user = this.$store.getters.getUSERNAME;
-      axios.post(url, {
-        id_mesa: this.mesaId,
-        mesa: this.mesa.nombre,
-        mozo: user,
-        tipo: 'precuenta'
-      }, this.config).then(function (_ref6) {
-        var data = _ref6.data;
-
-        if (data.msg == "OK") {
-          _this6.$router.push({
-            name: "Home"
-          });
-
-          _this6.articlesEnMesa = data.prod;
-          _this6.total = data.total; // this.salir();
-        } else {
-          Swal.fire({
-            title: "Advertencia!",
-            text: data.msg,
-            icon: "warning",
-            confirmButtonText: "OK"
-          });
-        }
-      })["catch"](function (error) {
-        if (error.response) {
-          if (error.response.status === 401) {
-            _this6.sesionCaducada();
-          }
+      var sinEnviarCocina = 0;
+      this.articlesEnMesa.forEach(function (element) {
+        if (element.increment > 0) {
+          sinEnviarCocina++;
         }
       });
+
+      if (sinEnviarCocina == 0) {
+        var url = "api/tablet/comanda/imprimir/precuenta";
+        var user = this.$store.getters.getUSERNAME;
+        axios.post(url, {
+          id_mesa: this.mesaId,
+          mesa: this.mesa.nombre,
+          mozo: user,
+          tipo: "precuenta"
+        }, this.config).then(function (_ref6) {
+          var data = _ref6.data;
+
+          if (data.msg == "OK") {
+            _this6.$router.push({
+              name: "Home"
+            });
+
+            _this6.articlesEnMesa = data.prod;
+            _this6.total = data.total; // this.salir();
+          } else {
+            Swal.fire({
+              title: "Advertencia!",
+              text: data.msg,
+              icon: "warning",
+              confirmButtonText: "OK"
+            });
+          }
+        })["catch"](function (error) {
+          if (error.response) {
+            if (error.response.status === 401) {
+              _this6.sesionCaducada();
+            }
+          }
+        });
+      } else {
+        Swal.fire({
+          title: "Advertencia!",
+          text: "Tiene detalles sin eliminar a cocina, eliminelos o envielos a cocina",
+          icon: "warning",
+          confirmButtonText: "OK"
+        });
+      }
     },
     salir: function salir() {
       var _this7 = this;

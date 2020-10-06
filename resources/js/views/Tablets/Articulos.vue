@@ -166,7 +166,6 @@ export default {
         )
         .then(({ data }) => {
           if (data.msg == "Ok") {
-            console.log(data.prod);
             this.articlesEnMesa = data.prod;
             this.total = data.total;
           } else {
@@ -258,7 +257,7 @@ export default {
       if (action == "remove") {
         cant = 0;
       }
-      if (item.print == 1 && action != "plus") {
+      if (item.print == 1 && action != "plus" && item.increment < 1) {
         Swal.fire({
           title: "Advertencia!",
           text: "Esta accion solo la puede ejecutar un administrador",
@@ -332,7 +331,7 @@ export default {
             id_mesa: this.mesaId,
             mesa: this.mesa.nombre,
             mozo: user,
-            tipo: 'cocina'
+            tipo: "cocina"
           },
           this.config
         )
@@ -355,49 +354,64 @@ export default {
           }
         })
         .catch(error => {
-            if (error.response) {
-              if (error.response.status === 401) {
-                this.sesionCaducada();
-              }
+          if (error.response) {
+            if (error.response.status === 401) {
+              this.sesionCaducada();
             }
-          });
+          }
+        });
     },
     sendPrecuenta() {
-      var url = `api/tablet/comanda/imprimir/precuenta`;
-      let user = this.$store.getters.getUSERNAME;
-      axios
-        .post(
-          url,
-          {
-            id_mesa: this.mesaId,
-            mesa: this.mesa.nombre,
-            mozo: user,
-            tipo: 'precuenta'
-          },
-          this.config
-        )
-        .then(({ data }) => {
-          if (data.msg == "OK") {
-            this.$router.push({ name: "Home" });
-            this.articlesEnMesa = data.prod;
-            this.total = data.total;
-           // this.salir();
-          } else {
-            Swal.fire({
-              title: "Advertencia!",
-              text: data.msg,
-              icon: "warning",
-              confirmButtonText: "OK"
-            });
-          }
-        })
-        .catch(error => {
+      var sinEnviarCocina = 0;
+      this.articlesEnMesa.forEach(element => {
+        if (element.increment > 0) {
+          sinEnviarCocina++;
+        }
+      });
+      if (sinEnviarCocina == 0) {
+        var url = `api/tablet/comanda/imprimir/precuenta`;
+        let user = this.$store.getters.getUSERNAME;
+        axios
+          .post(
+            url,
+            {
+              id_mesa: this.mesaId,
+              mesa: this.mesa.nombre,
+              mozo: user,
+              tipo: "precuenta"
+            },
+            this.config
+          )
+          .then(({ data }) => {
+            if (data.msg == "OK") {
+              this.$router.push({ name: "Home" });
+              this.articlesEnMesa = data.prod;
+              this.total = data.total;
+              // this.salir();
+            } else {
+              Swal.fire({
+                title: "Advertencia!",
+                text: data.msg,
+                icon: "warning",
+                confirmButtonText: "OK"
+              });
+            }
+          })
+          .catch(error => {
             if (error.response) {
               if (error.response.status === 401) {
                 this.sesionCaducada();
               }
             }
           });
+      } else {
+        Swal.fire({
+          title: "Advertencia!",
+          text: "Tiene detalles sin eliminar a cocina, eliminelos o envielos a cocina",
+          icon: "warning",
+          confirmButtonText: "OK"
+        });
+      }
     },
     salir() {
       var url = `api/tablet/comanda/liberar`;

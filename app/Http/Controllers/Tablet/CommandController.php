@@ -150,6 +150,9 @@ class CommandController extends Controller
 
             default:
                 $detalle = CommandMenu::where('id', $id_detalle)->first();
+                if ($detalle['print_status'] == 1 && $detalle['increment'] == 0) {
+                    return response()->json(['msg' =>  'Esta accion solo la puede hacer un administrador', 'status' => 0], 200);
+                }
                 if ($detalle->quantity == 1) {
                     return $this->eliminarItemDetalle($detalle, $id_cmd);
                 } else {
@@ -169,6 +172,7 @@ class CommandController extends Controller
                 'menus.id as idprod',
                 'menus.name as name',
                 'command_menu.quantity as cant',
+                'command_menu.increment as increment',
                 'command_menu.total as subtotal',
                 'command_menu.print_status as print',
             )
@@ -221,6 +225,7 @@ class CommandController extends Controller
                     'sub_total'         => DB::raw('sub_total + ' . $item['sub_total']),
                     'igv'               => DB::raw('igv + ' . $item['igv']),
                     'total'             => DB::raw('total + ' . $item['total']),
+                    'state'             => 'A',
                 ]
             );
 
