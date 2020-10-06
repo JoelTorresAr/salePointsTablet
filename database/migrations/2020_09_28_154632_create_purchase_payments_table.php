@@ -34,6 +34,8 @@ class CreatePurchasePaymentsTable extends Migration
      */
     public function down()
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('purchase_payments');
+        Schema::enableForeignKeyConstraints();
     }
 }
