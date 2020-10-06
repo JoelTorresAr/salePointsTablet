@@ -37,6 +37,8 @@ class CreateCommandPaytypeTable extends Migration
      */
     public function down()
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('command_paytype');
+        Schema::enableForeignKeyConstraints();
     }
 }
