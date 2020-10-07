@@ -5,10 +5,7 @@ namespace App\Http\Controllers\Tablet;
 use App\Http\Controllers\Controller;
 use App\Jobs\WarehouseDecrement;
 use App\Models\Command;
-use App\Models\CommandMenu;
-use App\Models\MenuSupply;
 use App\Models\Table;
-use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
@@ -105,7 +102,8 @@ class TicketController extends Controller
             );
             DB::table('commands')->where('id', $id_cmd)->update(
                 [
-                    'state'      => 2,
+                    'state'         => 2,
+                    'print_number'  =>  DB::raw('print_number + 1'),
                 ]
             );
             DB::table('notes')->where('command_id', $id_cmd)->update(
@@ -113,56 +111,20 @@ class TicketController extends Controller
                     'print_state'      => 1,
                 ]
             );
-/*
-            $almacen_id = Warehouse::where('shop_id', $detalles['shop_id'])->value('id');
-            if ($detallesC = CommandMenu::where([['command_id', $id_cmd], ['command_menu.state', 'A']])->get()) {
-                foreach ($detallesC as $key => $detalleC) {
-                    if ($detallesM = MenuSupply::where([['menu_id', $detalleC->menu_id]])->get()) {
-                        foreach ($detallesM as $key => $detalleM) {
-                            DB::beginTransaction();
-                            try {
-                                $cantidad = $detalleC->quantity;
-                                if ($detalleC->original_quantity == 0) {
-                                    $total = $detalleC->quantity * (float) $detalleM->quantity;
-                                    DB::table('supply_warehouse')->where([['warehouse_id', $almacen_id], ['supply_id', $detalleM->supply_id]])->update(
-                                        [
-                                            'current_quantity'          => DB::raw('current_quantity - ' . $total),
-                                        ]
-                                    );
-                                } else {
-                                    $total = ($detalleC->quantity - $detalleC->original_quantity) * (float) $detalleM->quantity;
-                                    DB::table('supply_warehouse')->where([['warehouse_id', $almacen_id], ['supply_id', $detalleM->supply_id]])->update(
-                                        [
-                                            'current_quantity'          => DB::raw('current_quantity - ' . $total),
-                                        ]
-                                    );
-                                }
-                                DB::table('command_menu')->where('id', $detalleC->id)->update(
-                                    [
-                                        'original_quantity' => $cantidad,
-                                    ]
-                                );
-                                DB::commit();
-                                echo 'Almacen alterado';
-                                // all good
-                            } catch (Exception $e) {
-                                DB::rollback();
-                                $this->failed($e);
-                            }
-                        }
-                    }
-                }
-            }*/
             //WarehouseDecrement::dispatch($id_cmd, $detalles['shop_id']);
             dispatch(new WarehouseDecrement($id_cmd, $detalles['shop_id']));
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollback();
             return response()->json(['msg' => $e, 'status' => 0, 'tipo' => 'db'], 200);
         }
 
 
         try {
+
+            $print_number = DB::table('commands')
+                ->where('id', $id_cmd)
+                ->value('print_number');
 
             $date_time = Carbon::now('America/Lima')->toDateTimeString();
             // Configuracion de conexion
@@ -173,20 +135,23 @@ class TicketController extends Controller
             $impresora->setDoubleStrike(false);
             $impresora->setJustification(Printer::JUSTIFY_CENTER);
             $impresora->setTextSize(8, 8);
-            $impresora->setFont(Printer::FONT_B);
+            $impresora->setFont(Printer::FONT_B);/*
             $impresora->text("COCINA \n");
             $impresora->setTextSize(4, 4);
-            $impresora->setFont(Printer::FONT_B);
+            $impresora->setFont(Printer::FONT_B);*/
             $impresora->text($detalles['mesa'] . "\n");
+            $impresora->setTextSize(2, 2);
+            $impresora->text("IMPRESION N°: ".$print_number . "\n");
+            $impresora->feed(1);
+
             //Detalle
             $impresora->setJustification(Printer::JUSTIFY_LEFT);
             $impresora->setEmphasis(true);
-            $impresora->setTextSize(2, 2);
             $impresora->text("MOZO: " . $mozo . "\n");
             $impresora->text("Fecha-Hora: " . $date_time . "\n");
             $impresora->feed(1);
             $impresora->setJustification(Printer::JUSTIFY_RIGHT);
-            $impresora->text(new itemCocina('CANT','PRODUCTO'));
+            $impresora->text(new itemCocina('CANT', 'PRODUCTO'));
             $impresora->setJustification(Printer::JUSTIFY_CENTER);
             $impresora->text("******************************\n");
             $impresora->feed(2);
@@ -199,17 +164,17 @@ class TicketController extends Controller
                 $cant   =  $value->cant;
                 $incremento = $value->increment;
                 if ($std_imp == 0) {
-                    $impresora->text(new itemCocina("(".$cant.")", $nombre));
+                    $impresora->text(new itemCocina("(" . $cant . ")", $nombre));
                     $impresora->feed(1);
                 } else {
                     if ($incremento != 0) {
                         $signo = $incremento <=> 0;
                         if ($signo == -1) {
-                            $impresora->text(new itemCocina("(".$cant.")",$nombre . " (" . "-" . $incremento . ")"));
+                            $impresora->text(new itemCocina("(" . $cant . ")", $nombre . " (" . "-" . $incremento . ")"));
                             $impresora->feed(1);
                         }
                         if ($signo == 1) {
-                            $impresora->text(new itemCocina("(".$cant.")",$nombre . " (" . "+" . $incremento . ")"));
+                            $impresora->text(new itemCocina("(" . $cant . ")", $nombre . " (" . "+" . $incremento . ")"));
                             $impresora->feed(1);
                         }
                     }
@@ -222,18 +187,14 @@ class TicketController extends Controller
             }
 
             $impresora->feed(1);
-            // Pie de pagina
-            /*
-            $impresora->setJustification(Printer::JUSTIFY_LEFT);
-            $impresora->setTextSize(1, 1);
-            $impresora->text("Fecha-Hora: " . $date_time);
-            $impresora->feed(1);*/
-        } catch (\Throwable $th) {
-            return response()->json(['msg' => $th, 'status' => 0, 'tipo' => 'tikect'], 200);
-        } finally {
-            $impresora->cut();
+            $impresora->cut(Printer::CUT_PARTIAL);
+            //$impresora->cut();
             $impresora->close();
-        };
+        } catch (\Exception $e) {
+            return response()->json(['msg' => 'Error de ticketera', 'status' => 0, 'tipo' => 'tikect'], 200);
+        } catch (\Throwable $e) {
+            return response()->json(['msg' => 'Error de ticketera', 'status' => 0, 'tipo' => 'tikect'], 200);
+        }
         return response()->json(['msg' => 'OK', 'status' => 1], 200);
     }
 
@@ -247,74 +208,75 @@ class TicketController extends Controller
                 ]
             );
 
-            try {
-
-                $date_time = Carbon::now('America/Lima')->toDateTimeString();
-                // Configuracion de conexion
-                $nombreImpresora = "Cocina";
-                $connector = new WindowsPrintConnector($nombreImpresora);
-                $impresora = new Printer($connector);
-                // Cabecera de ticket
-                $impresora->setDoubleStrike(false);
-                $impresora->setJustification(Printer::JUSTIFY_CENTER);
-                $impresora->setTextSize(4, 1.5);
-                $impresora->text("PRE-CUENTA\n");
-                $impresora->feed(1);
-                $impresora->setJustification(Printer::JUSTIFY_LEFT);
-                $impresora->setTextSize(1, 1.5);
-                $impresora->setEmphasis(true);
-                $impresora->setFont(Printer::FONT_B);
-                $impresora->text("MOZO: " . $mozo . "\n");
-                $impresora->text("Fecha-Hora: " . $date_time . "\n");
-                $impresora->feed(1);
-                $impresora->setJustification(Printer::JUSTIFY_RIGHT);
-                $impresora->text(new itemPrecuenta('Cant ', 'Descripcion', 'Sub Total'));
-                $asterisco = '';
-                $linea = '';
-                for ($i = 0; $i < 64; $i++) {
-                    $asterisco = $asterisco . '*';
-                    $linea = $linea . '-';
-                }
-                $impresora->text($asterisco . "\n");
-                $impresora->feed(2);
-                //Items
-                $impresora->setEmphasis(false);
-                $impresora->setJustification(Printer::JUSTIFY_RIGHT);
-
-                foreach ($items as $key => $value) {
-                    $nombre = $value->name;
-                    $cant   =  $value->cant;
-                    $total = $value->total;
-                    $impresora->text(new itemPrecuenta($cant, $nombre, $total));
-                    $impresora->feed(1);
-                }
-
-                $impresora->text($linea . "\n");
-                $impresora->feed(1);
-                $impresora->setEmphasis(true);
-                $impresora->text("Total Pagar:       " . $command->total);
-                $impresora->feed(2);
-                $impresora->setJustification(Printer::JUSTIFY_CENTER);
-                $impresora->setEmphasis(false);
-                $impresora->text("Este no es un comprobante de Pago.\n");
-                $impresora->text("Por favor canjear en caja si desea factura o ticket\n");
-                $impresora->text("Gracias por su gentil preferencia\n");
-                $impresora->feed(1);
-                // Pie de pagina
-            } catch (\Throwable $th) {
-                DB::rollback();
-                return response()->json(['msg' => $th, 'status' => 0, 'tipo' => 'tikect'], 200);
-            } finally {
-                $impresora->cut();
-                $impresora->close();
-            };
-
             DB::commit();
-            return response()->json(['msg' => 'OK', 'status' => 1], 200);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['msg' => $e, 'status' => 0, 'tipo' => 'db'], 200);
         }
+
+        try {
+
+            $date_time = Carbon::now('America/Lima')->toDateTimeString();
+            // Configuracion de conexion
+            $nombreImpresora = "Cocina";
+            $connector = new WindowsPrintConnector($nombreImpresora);
+            $impresora = new Printer($connector);
+            // Cabecera de ticket
+            $impresora->setDoubleStrike(false);
+            $impresora->setJustification(Printer::JUSTIFY_CENTER);
+            $impresora->setTextSize(4, 1.5);
+            $impresora->text("PRE-CUENTA\n");
+            $impresora->feed(1);
+            $impresora->setJustification(Printer::JUSTIFY_LEFT);
+            $impresora->setTextSize(1, 1.5);
+            $impresora->setEmphasis(true);
+            $impresora->setFont(Printer::FONT_B);
+            $impresora->text("MOZO: " . $mozo . "\n");
+            $impresora->text("Fecha-Hora: " . $date_time . "\n");
+            $impresora->feed(1);
+            $impresora->setJustification(Printer::JUSTIFY_RIGHT);
+            $impresora->text(new itemPrecuenta('Cant ', 'Descripcion', 'Sub Total'));
+            $asterisco = '';
+            $linea = '';
+            for ($i = 0; $i < 64; $i++) {
+                $asterisco = $asterisco . '*';
+                $linea = $linea . '-';
+            }
+            $impresora->text($asterisco . "\n");
+            $impresora->feed(2);
+            //Items
+            $impresora->setEmphasis(false);
+            $impresora->setJustification(Printer::JUSTIFY_RIGHT);
+
+            foreach ($items as $key => $value) {
+                $nombre = $value->name;
+                $cant   =  $value->cant;
+                $total = $value->total;
+                $impresora->text(new itemPrecuenta($cant, $nombre, $total));
+                $impresora->feed(1);
+            }
+
+            $impresora->text($linea . "\n");
+            $impresora->feed(1);
+            $impresora->setEmphasis(true);
+            $impresora->text("Total Pagar:       " . $command->total);
+            $impresora->feed(2);
+            $impresora->setJustification(Printer::JUSTIFY_CENTER);
+            $impresora->setEmphasis(false);
+            $impresora->text("Este no es un comprobante de Pago.\n");
+            $impresora->text("Por favor canjear en caja si desea factura o ticket\n");
+            $impresora->text("Gracias por su gentil preferencia\n");
+            $impresora->feed(1);
+            $impresora->cut(Printer::CUT_PARTIAL);
+            //$impresora->cut();
+            $impresora->close();
+            // Pie de pagina
+        } catch (\Throwable $th) {
+            return response()->json(['msg' => 'Error de ticketera', 'status' => 0, 'tipo' => 'tikect'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['msg' => 'Error de ticketera', 'status' => 0, 'tipo' => 'tikect'], 200);
+        }
+        return response()->json(['msg' => 'OK', 'status' => 1], 200);
     }
 }
 /* A wrapper to do organise item names & prices into columns */
@@ -361,9 +323,9 @@ class itemPrecuenta
         $left = str_pad($this->cant, $leftCols);
         $inter = str_pad($this->name, $interCols);
 
-        $lengthName = strlen ($this->name);
-        if($lengthName > 49){
-          $inter = substr($this->name, 0, 50);
+        $lengthName = strlen($this->name);
+        if ($lengthName > 49) {
+            $inter = substr($this->name, 0, 47) . "...";
         }
 
         $right = str_pad($this->price, $rightCols, ' ', STR_PAD_LEFT);
