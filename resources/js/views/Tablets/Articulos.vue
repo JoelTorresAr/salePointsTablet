@@ -338,6 +338,7 @@ export default {
       var url = `api/tablet/comanda/imprimir/cocina`;
       //console.log(url)
       let user = this.$store.getters.getUSERNAME;
+      const store_id = this.$store.getters.getSTORE_ID;
       axios
         .post(
           url,
@@ -345,7 +346,8 @@ export default {
             id_mesa: this.mesaId,
             mesa: this.mesa.nombre,
             mozo: user,
-            tipo: "cocina"
+            tipo: "cocina",
+            shop_id: store_id
           },
           this.config
         )

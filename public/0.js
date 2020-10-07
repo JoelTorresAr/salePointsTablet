@@ -345,11 +345,13 @@ __webpack_require__.r(__webpack_exports__);
       var url = "api/tablet/comanda/imprimir/cocina"; //console.log(url)
 
       var user = this.$store.getters.getUSERNAME;
+      var store_id = this.$store.getters.getSTORE_ID;
       axios.post(url, {
         id_mesa: this.mesaId,
         mesa: this.mesa.nombre,
         mozo: user,
-        tipo: "cocina"
+        tipo: "cocina",
+        shop_id: store_id
       }, this.config).then(function (_ref5) {
         var data = _ref5.data;
 

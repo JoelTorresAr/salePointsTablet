@@ -22,7 +22,7 @@ class CreateSuppliesTable extends Migration
             $table->decimal('factor',17,4);
             $table->decimal('auto_conversion',17,4);
             $table->text('description');
-            $table->string('state',1);
+            $table->string('state',1)->default('A');
             
             $table->foreign('unity_id')->references('id')->on('unities')
             ->onDelete('cascade')

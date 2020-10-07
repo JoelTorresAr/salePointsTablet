@@ -16,7 +16,7 @@ class CreateUnitiesTable extends Migration
         Schema::create('unities', function (Blueprint $table) {
             $table->id();
             $table->string('name',100);
-            $table->string('state',1);
+            $table->string('state',1)->default('A');
         });
     }
 

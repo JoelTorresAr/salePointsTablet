@@ -16,7 +16,7 @@ class CreateWarehouseFamiliesTable extends Migration
         Schema::create('warehouse_families', function (Blueprint $table) {
             $table->id();
             $table->string('name',50);
-            $table->string('state',1);
+            $table->string('state',1)->default('A');
         });
     }
 

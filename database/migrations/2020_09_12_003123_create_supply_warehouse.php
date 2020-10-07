@@ -18,7 +18,7 @@ class CreateSupplyWarehouse extends Migration
             $table->unsignedBigInteger('warehouse_id');
             $table->unsignedBigInteger('supply_id');
             $table->decimal('current_quantity',17,2);
-            $table->string('state',1);
+            $table->string('state',1)->default('A');
 
             $table->foreign('warehouse_id')->references('id')->on('warehouses')
             ->onDelete('cascade')
