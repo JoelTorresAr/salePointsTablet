@@ -33,7 +33,7 @@
           >
             <v-card-title class="p-0">
               {{item.nombre}}
-              <i v-show="showChecksinMesa(item)" :class="checkJoin(index)"></i>
+              <i v-show="showChecksinMesa(item)" :class="checkJoin(item.id)"></i>
             </v-card-title>
             <v-card-text class="pb-0">
               {{item.mesero}}
@@ -117,34 +117,6 @@
         @click="logout"
       >BLOQUEAR</v-btn>
     </v-footer>
-
-    <v-dialog v-model="dialog" persistent max-width="600px" height="100rem">
-      <v-card>
-        <v-card-text class="p-0">
-          <v-container class="pt-0 pb-0">
-            <v-row>
-              <v-col cols="12" class="pt-0 pb-0">
-                <v-text-field
-                  class="centered-input display-1"
-                  type="number"
-                  min="1"
-                  maxlength="2"
-                  v-model="numcomen"
-                  :counter="2"
-                  :rules="[v => !!v || 'Ingrese una cantidad']"
-                  required
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-        <v-card-actions class="pt-0 pb-0">
-          <v-spacer></v-spacer>
-          <v-btn color="error" text @click="dialog = false">Close</v-btn>
-          <v-btn color="blue darken-1" text @click="saveComanda">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-app>
 </template>
 
@@ -298,7 +270,7 @@ export default {
             var existe = false;
             var ix;
             this.arrayMesas.forEach(e => {
-              if (e.id == index) {
+              if (e.id == item.id) {
                 existe = true;
                 ix = e;
               }
@@ -308,7 +280,7 @@ export default {
               this.arrayMesas.splice(i, 1);
             } else {
               var mesa = {
-                id: index,
+                id: item.id,
                 id_cmd: item.id_cmd,
                 st_cmd: item.st_cmd,
                 st_join: 1
@@ -373,13 +345,13 @@ export default {
           break;
       }
     },
-    checkJoin(index) {
+    checkJoin(id) {
       var std = "";
       switch (this.actionButton) {
         case "JUNTAR":
           std = "mdi mdi-checkbox-blank-outline";
           this.arrayMesas.forEach(e => {
-            if (e.id == index) {
+            if (e.id == id) {
               std = "mdi mdi-checkbox-marked-outline";
             }
           });
@@ -387,7 +359,7 @@ export default {
         case "SEPARAR":
           std = "mdi mdi-checkbox-blank-outline";
           this.arrayMesas.forEach(e => {
-            if (e.id == index) {
+            if (e.id == id) {
               std = "mdi mdi-checkbox-marked-outline";
             }
           });
@@ -395,7 +367,7 @@ export default {
         case "MOVER":
           std = "mdi mdi-checkbox-blank-outline";
           this.arrayMesas.forEach(e => {
-            if (e.id == index) {
+            if (e.id == id) {
               std = "mdi mdi-checkbox-marked-outline";
             }
           });
@@ -488,48 +460,21 @@ export default {
           });
       }
     },
-    saveComanda() {
-      var id = this.$store.getters.getUSERID;
-      var url = `${this.ip}/?nomFun=tb_new_cmd&parm_pin=${this.pin}&parm_piso=${this.pisoActual}&parm_id_mesas=${this.mesaId}&parm_num=${this.numcomen}&parm_tipocmd=1&parm_id_mesero=${id}&parm_tipo=M$`;
-      axios
-        .get(url)
-        .then(({ data }) => {
-          if (data.msg == "Ok") {
-            //this.getMesas(this.pisoActual);
-            this.mesaActual.id_cmd = data.idcmd;
-            this.$store.commit(
-              "SET_MESA_ACTUAL",
-              JSON.stringify(this.mesaActual)
-            );
-            this.$router.push({ name: "Store" });
-            this.$store.commit("SET_PISO_ACTUAL", this.pisoActual);
-            this.dialog = false;
-          } else {
-            Swal.fire({
-              title: "Advertencia!",
-              text: data.msg,
-              icon: "warning",
-              confirmButtonText: "Cool"
-            });
-            this.getMesas(this.pisoActual);
-            this.dialog = false;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    },
     unirMesas() {
-      var id = this.$store.getters.getUSERID;
       var id_cmd = "";
-      var id_mesas = "";
+      var id_mesa = "";
+      var id_mesas = [];
       this.arrayMesas.forEach(e => {
-        if (e.id_cmd != 0) {
+        if (e.id_cmd != null) {
           id_cmd = e.id_cmd;
+          id_mesa = e.id;
+        } else {
+          id_mesas.push(e.id);
         }
-        id_mesas = id_mesas + "," + String(e.id);
       });
-      var url = `${this.ip}/?nomFun=tb_juntar_mesa&parm_id_cmd=${id_cmd}&parm_id_mesas=${id_mesas}&parm_tipo=M$`;
+      console.log('id mesas');
+      console.log(id_mesas);
+      var url = `api/tablet/mesas/juntar`;
       axios
         .get(url)
         .then(({ data }) => {

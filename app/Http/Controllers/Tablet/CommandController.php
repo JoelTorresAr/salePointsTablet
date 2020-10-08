@@ -76,9 +76,10 @@ class CommandController extends Controller
 
                 DB::table('tables')->where('id', $mesa['id'])
                     ->update([
-                        'status'      => 'O',
-                        'command_id'  => $id_cmd,
-                        'order_status' => 1
+                        'status'       => 'O',
+                        'command_id'   => $id_cmd,
+                        'order_status' => 1,
+                        'original_cmd' => 'A'
                     ]);
             });
             return response()->json(['msg' =>  'OK', 'status' => 1], 200);

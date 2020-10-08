@@ -28,6 +28,7 @@ Route::group(['namespace' => 'Tablet'], function () {
 
     Route::group(['middleware' => ['auth:api'], 'prefix' => 'tablet'], function ($router) {
         Route::post('mesas', 'CommandController@mesas');
+        Route::post('mesas/juntar', 'MesaController@juntar');
         Route::post('comanda/nueva', 'CommandController@nuevaComanda');
         Route::post('comanda/item/agregar', 'CommandController@agregarItem');
         Route::post('comanda/item/listar', 'CommandController@listarItemsMesa');

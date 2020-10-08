@@ -131,34 +131,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -324,7 +296,7 @@ __webpack_require__.r(__webpack_exports__);
             var existe = false;
             var ix;
             this.arrayMesas.forEach(function (e) {
-              if (e.id == index) {
+              if (e.id == item.id) {
                 existe = true;
                 ix = e;
               }
@@ -335,7 +307,7 @@ __webpack_require__.r(__webpack_exports__);
               this.arrayMesas.splice(i, 1);
             } else {
               var mesa = {
-                id: index,
+                id: item.id,
                 id_cmd: item.id_cmd,
                 st_cmd: item.st_cmd,
                 st_join: 1
@@ -407,14 +379,14 @@ __webpack_require__.r(__webpack_exports__);
           break;
       }
     },
-    checkJoin: function checkJoin(index) {
+    checkJoin: function checkJoin(id) {
       var std = "";
 
       switch (this.actionButton) {
         case "JUNTAR":
           std = "mdi mdi-checkbox-blank-outline";
           this.arrayMesas.forEach(function (e) {
-            if (e.id == index) {
+            if (e.id == id) {
               std = "mdi mdi-checkbox-marked-outline";
             }
           });
@@ -423,7 +395,7 @@ __webpack_require__.r(__webpack_exports__);
         case "SEPARAR":
           std = "mdi mdi-checkbox-blank-outline";
           this.arrayMesas.forEach(function (e) {
-            if (e.id == index) {
+            if (e.id == id) {
               std = "mdi mdi-checkbox-marked-outline";
             }
           });
@@ -432,7 +404,7 @@ __webpack_require__.r(__webpack_exports__);
         case "MOVER":
           std = "mdi mdi-checkbox-blank-outline";
           this.arrayMesas.forEach(function (e) {
-            if (e.id == index) {
+            if (e.id == id) {
               std = "mdi mdi-checkbox-marked-outline";
             }
           });
@@ -544,27 +516,30 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
-    saveComanda: function saveComanda() {
+    unirMesas: function unirMesas() {
       var _this3 = this;
 
-      var id = this.$store.getters.getUSERID;
-      var url = "".concat(this.ip, "/?nomFun=tb_new_cmd&parm_pin=").concat(this.pin, "&parm_piso=").concat(this.pisoActual, "&parm_id_mesas=").concat(this.mesaId, "&parm_num=").concat(this.numcomen, "&parm_tipocmd=1&parm_id_mesero=").concat(id, "&parm_tipo=M$");
+      var id_cmd = "";
+      var id_mesa = "";
+      var id_mesas = [];
+      this.arrayMesas.forEach(function (e) {
+        if (e.id_cmd != null) {
+          id_cmd = e.id_cmd;
+          id_mesa = e.id;
+        } else {
+          id_mesas.push(e.id);
+        }
+      });
+      console.log('id mesas');
+      console.log(id_mesas);
+      var url = "api/tablet/mesas/juntar";
       axios.get(url).then(function (_ref3) {
         var data = _ref3.data;
 
         if (data.msg == "Ok") {
-          //this.getMesas(this.pisoActual);
-          _this3.mesaActual.id_cmd = data.idcmd;
+          _this3.arrayMesas = [];
 
-          _this3.$store.commit("SET_MESA_ACTUAL", JSON.stringify(_this3.mesaActual));
-
-          _this3.$router.push({
-            name: "Store"
-          });
-
-          _this3.$store.commit("SET_PISO_ACTUAL", _this3.pisoActual);
-
-          _this3.dialog = false;
+          _this3.getMesas(_this3.pisoActual);
         } else {
           Swal.fire({
             title: "Advertencia!",
@@ -575,30 +550,30 @@ __webpack_require__.r(__webpack_exports__);
 
           _this3.getMesas(_this3.pisoActual);
 
-          _this3.dialog = false;
+          _this3.arrayMesas = [];
         }
       })["catch"](function (error) {
+        _this3.arrayMesas = [];
         console.log(error);
       });
     },
-    unirMesas: function unirMesas() {
+    separarMesas: function separarMesas() {
       var _this4 = this;
 
-      var id = this.$store.getters.getUSERID;
       var id_cmd = "";
-      var id_mesas = "";
+      var id_mesa = "";
       this.arrayMesas.forEach(function (e) {
         if (e.id_cmd != 0) {
           id_cmd = e.id_cmd;
         }
 
-        id_mesas = id_mesas + "," + String(e.id);
+        id_mesa = String(e.id);
       });
-      var url = "".concat(this.ip, "/?nomFun=tb_juntar_mesa&parm_id_cmd=").concat(id_cmd, "&parm_id_mesas=").concat(id_mesas, "&parm_tipo=M$");
+      var url = "".concat(this.ip, "/?nomFun=tb_separar_mesa&parm_id_cmd=").concat(id_cmd, "&parm_id_mesa=").concat(id_mesa, "&parm_tipo=M$");
       axios.get(url).then(function (_ref4) {
         var data = _ref4.data;
 
-        if (data.msg == "Ok") {
+        if (data.msg == "OK") {
           _this4.arrayMesas = [];
 
           _this4.getMesas(_this4.pisoActual);
@@ -619,7 +594,7 @@ __webpack_require__.r(__webpack_exports__);
         console.log(error);
       });
     },
-    separarMesas: function separarMesas() {
+    moverMesas: function moverMesas() {
       var _this5 = this;
 
       var id_cmd = "";
@@ -627,11 +602,11 @@ __webpack_require__.r(__webpack_exports__);
       this.arrayMesas.forEach(function (e) {
         if (e.id_cmd != 0) {
           id_cmd = e.id_cmd;
+        } else {
+          id_mesa = e.id;
         }
-
-        id_mesa = String(e.id);
       });
-      var url = "".concat(this.ip, "/?nomFun=tb_separar_mesa&parm_id_cmd=").concat(id_cmd, "&parm_id_mesa=").concat(id_mesa, "&parm_tipo=M$");
+      var url = "".concat(this.ip, "/?nomFun=tb_mover_mesa&parm_id_cmd=").concat(id_cmd, "&parm_id_mesa=").concat(id_mesa, "&parm_tipo=M$");
       axios.get(url).then(function (_ref5) {
         var data = _ref5.data;
 
@@ -653,43 +628,6 @@ __webpack_require__.r(__webpack_exports__);
         }
       })["catch"](function (error) {
         _this5.arrayMesas = [];
-        console.log(error);
-      });
-    },
-    moverMesas: function moverMesas() {
-      var _this6 = this;
-
-      var id_cmd = "";
-      var id_mesa = "";
-      this.arrayMesas.forEach(function (e) {
-        if (e.id_cmd != 0) {
-          id_cmd = e.id_cmd;
-        } else {
-          id_mesa = e.id;
-        }
-      });
-      var url = "".concat(this.ip, "/?nomFun=tb_mover_mesa&parm_id_cmd=").concat(id_cmd, "&parm_id_mesa=").concat(id_mesa, "&parm_tipo=M$");
-      axios.get(url).then(function (_ref6) {
-        var data = _ref6.data;
-
-        if (data.msg == "OK") {
-          _this6.arrayMesas = [];
-
-          _this6.getMesas(_this6.pisoActual);
-        } else {
-          Swal.fire({
-            title: "Advertencia!",
-            text: data.msg,
-            icon: "warning",
-            confirmButtonText: "Cool"
-          });
-
-          _this6.getMesas(_this6.pisoActual);
-
-          _this6.arrayMesas = [];
-        }
-      })["catch"](function (error) {
-        _this6.arrayMesas = [];
         console.log(error);
       });
     },
@@ -915,7 +853,7 @@ var render = function() {
                               expression: "showChecksinMesa(item)"
                             }
                           ],
-                          class: _vm.checkJoin(index)
+                          class: _vm.checkJoin(item.id)
                         })
                       ]),
                       _vm._v(" "),
@@ -1113,109 +1051,6 @@ var render = function() {
               on: { click: _vm.logout }
             },
             [_vm._v("BLOQUEAR")]
-          )
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "v-dialog",
-        {
-          attrs: { persistent: "", "max-width": "600px", height: "100rem" },
-          model: {
-            value: _vm.dialog,
-            callback: function($$v) {
-              _vm.dialog = $$v
-            },
-            expression: "dialog"
-          }
-        },
-        [
-          _c(
-            "v-card",
-            [
-              _c(
-                "v-card-text",
-                { staticClass: "p-0" },
-                [
-                  _c(
-                    "v-container",
-                    { staticClass: "pt-0 pb-0" },
-                    [
-                      _c(
-                        "v-row",
-                        [
-                          _c(
-                            "v-col",
-                            { staticClass: "pt-0 pb-0", attrs: { cols: "12" } },
-                            [
-                              _c("v-text-field", {
-                                staticClass: "centered-input display-1",
-                                attrs: {
-                                  type: "number",
-                                  min: "1",
-                                  maxlength: "2",
-                                  counter: 2,
-                                  rules: [
-                                    function(v) {
-                                      return !!v || "Ingrese una cantidad"
-                                    }
-                                  ],
-                                  required: ""
-                                },
-                                model: {
-                                  value: _vm.numcomen,
-                                  callback: function($$v) {
-                                    _vm.numcomen = $$v
-                                  },
-                                  expression: "numcomen"
-                                }
-                              })
-                            ],
-                            1
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-card-actions",
-                { staticClass: "pt-0 pb-0" },
-                [
-                  _c("v-spacer"),
-                  _vm._v(" "),
-                  _c(
-                    "v-btn",
-                    {
-                      attrs: { color: "error", text: "" },
-                      on: {
-                        click: function($event) {
-                          _vm.dialog = false
-                        }
-                      }
-                    },
-                    [_vm._v("Close")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-btn",
-                    {
-                      attrs: { color: "blue darken-1", text: "" },
-                      on: { click: _vm.saveComanda }
-                    },
-                    [_vm._v("Save")]
-                  )
-                ],
-                1
-              )
-            ],
-            1
           )
         ],
         1

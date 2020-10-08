@@ -21,6 +21,7 @@ class CreateTablesTable extends Migration
             $table->string('joined',1)->default('0');
             $table->string('order_status',1)->default('0');
             $table->unsignedBigInteger('floor_id');
+            $table->string('original_cmd',1)->default('I');
 
             $table->foreign('floor_id')->references('id')->on('floors')
             ->onDelete('cascade')
