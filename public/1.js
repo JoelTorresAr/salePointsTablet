@@ -474,12 +474,7 @@ __webpack_require__.r(__webpack_exports__);
             _this2.$store.commit("SET_PISO_ACTUAL", _this2.pisoActual);
           } else {
             if (data.msg == "Comanda no existe") {
-              Swal.fire({
-                title: "Advertencia!",
-                text: data.msg,
-                icon: "warning",
-                confirmButtonText: "Cool"
-              });
+              _this2.swalMessage(data.msg);
 
               _this2.getMesas(_this2.pisoActual);
             } else {
@@ -519,43 +514,48 @@ __webpack_require__.r(__webpack_exports__);
     unirMesas: function unirMesas() {
       var _this3 = this;
 
-      var id_cmd = "";
+      var id_cmd = [];
       var id_mesa = "";
       var id_mesas = [];
       this.arrayMesas.forEach(function (e) {
         if (e.id_cmd != null) {
-          id_cmd = e.id_cmd;
+          id_cmd.push(e.id_cmd);
           id_mesa = e.id;
         } else {
           id_mesas.push(e.id);
         }
       });
-      console.log('id mesas');
-      console.log(id_mesas);
-      var url = "api/tablet/mesas/juntar";
-      axios.get(url).then(function (_ref3) {
-        var data = _ref3.data;
+      var cant_cmd = id_cmd.length;
 
-        if (data.msg == "Ok") {
+      if (cant_cmd == 1) {
+        var url = "api/tablet/mesas/juntar";
+        axios.post(url, {
+          id: this.mesaId
+        }, this.config).then(function (_ref3) {
+          var data = _ref3.data;
+
+          if (data.msg == "Ok") {
+            _this3.arrayMesas = [];
+
+            _this3.getMesas(_this3.pisoActual);
+          } else {
+            _this3.swalMessage(data.msg);
+
+            _this3.getMesas(_this3.pisoActual);
+
+            _this3.arrayMesas = [];
+          }
+        })["catch"](function (error) {
           _this3.arrayMesas = [];
+          console.log(error);
+        });
+      }
 
-          _this3.getMesas(_this3.pisoActual);
-        } else {
-          Swal.fire({
-            title: "Advertencia!",
-            text: data.msg,
-            icon: "warning",
-            confirmButtonText: "Cool"
-          });
-
-          _this3.getMesas(_this3.pisoActual);
-
-          _this3.arrayMesas = [];
-        }
-      })["catch"](function (error) {
-        _this3.arrayMesas = [];
-        console.log(error);
-      });
+      if (cant_cmd > 1) {
+        this.swalMessage("Seleccione solo una mesa que tenga comanda");
+      } else {
+        this.swalMessage("Seleecione al menos una mesa con comanda");
+      }
     },
     separarMesas: function separarMesas() {
       var _this4 = this;
@@ -638,15 +638,20 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     sesionCaducada: function sesionCaducada() {
-      Swal.fire({
-        title: "Advertencia!",
-        text: "La sesion ha caducado",
-        icon: "warning",
-        confirmButtonText: "OK"
-      });
+      this.swalMessage('La sesion ha caducado');
       this.$store.commit("SET_PIN", null);
       this.$router.push({
         name: "Login"
+      });
+    },
+    swalMessage: function swalMessage(msg) {
+      var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "Advertencia!";
+      var icon = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "warning";
+      Swal.fire({
+        title: title,
+        text: msg,
+        icon: icon,
+        confirmButtonText: "Ok"
       });
     }
   }

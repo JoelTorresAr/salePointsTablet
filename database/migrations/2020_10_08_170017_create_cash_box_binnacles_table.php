@@ -15,11 +15,13 @@ class CreateCashBoxBinnaclesTable extends Migration
     {
         Schema::create('cash_box_binnacles', function (Blueprint $table) {
             $table->id();
-            $table->decimal('input',17,2)->nullable();
-            $table->decimal('output',17,2)->nullable();
-            $table->decimal('balance',17,2)->nullable();
+            $table->text('description');
+            $table->decimal('input',17,2);
+            $table->decimal('output',17,2);
+            $table->decimal('balance',17,2);
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('cash_box_id');
+            $table->unsignedBigInteger('opening_id');
             $table->dateTime('date_time',0)->useCurrent();
         });
     }

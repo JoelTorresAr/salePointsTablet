@@ -24,11 +24,15 @@ class CreatePurchasesTable extends Migration
             $table->decimal('total',17,4);
             $table->string('state',1);
             $table->unsignedBigInteger('warehouse_id');
+            $table->unsignedBigInteger('invoice_id');
 
             $table->foreign('provider_id')->references('id')->on('providers')
             ->onDelete('cascade')
             ->onUpdate('cascade');
             $table->foreign('warehouse_id')->references('id')->on('warehouses')
+            ->onDelete('cascade')
+            ->onUpdate('cascade');
+            $table->foreign('invoice_id')->references('id')->on('invoices')
             ->onDelete('cascade')
             ->onUpdate('cascade');
         });

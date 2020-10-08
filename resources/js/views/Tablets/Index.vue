@@ -421,12 +421,7 @@ export default {
               this.$store.commit("SET_PISO_ACTUAL", this.pisoActual);
             } else {
               if (data.msg == "Comanda no existe") {
-                Swal.fire({
-                  title: "Advertencia!",
-                  text: data.msg,
-                  icon: "warning",
-                  confirmButtonText: "Cool"
-                });
+                this.swalMessage(data.msg);
                 this.getMesas(this.pisoActual);
               } else {
                 var name = this.$store.getters.getUSERNAME;
@@ -461,41 +456,43 @@ export default {
       }
     },
     unirMesas() {
-      var id_cmd = "";
+      var id_cmd = [];
       var id_mesa = "";
       var id_mesas = [];
       this.arrayMesas.forEach(e => {
         if (e.id_cmd != null) {
-          id_cmd = e.id_cmd;
+          id_cmd.push(e.id_cmd);
           id_mesa = e.id;
         } else {
           id_mesas.push(e.id);
         }
       });
-      console.log('id mesas');
-      console.log(id_mesas);
-      var url = `api/tablet/mesas/juntar`;
-      axios
-        .get(url)
-        .then(({ data }) => {
-          if (data.msg == "Ok") {
+      var cant_cmd = id_cmd.length;
+      if ( cant_cmd == 1) {
+        var url = `api/tablet/mesas/juntar`;
+        axios
+          .post(url, { id: this.mesaId }, this.config)
+          .then(({ data }) => {
+            if (data.msg == "Ok") {
+              this.arrayMesas = [];
+              this.getMesas(this.pisoActual);
+            } else {
+              this.swalMessage(data.msg);
+              this.getMesas(this.pisoActual);
+              this.arrayMesas = [];
+            }
+          })
+          .catch(error => {
             this.arrayMesas = [];
-            this.getMesas(this.pisoActual);
-          } else {
-            Swal.fire({
-              title: "Advertencia!",
-              text: data.msg,
-              icon: "warning",
-              confirmButtonText: "Cool"
-            });
-            this.getMesas(this.pisoActual);
-            this.arrayMesas = [];
-          }
-        })
-        .catch(error => {
-          this.arrayMesas = [];
-          console.log(error);
-        });
+            console.log(error);
+          });
+      } 
+      if(cant_cmd >1){
+        this.swalMessage("Seleccione solo una mesa que tenga comanda");
+      }
+      else {
+        this.swalMessage("Seleecione al menos una mesa con comanda");
+      }
     },
     separarMesas() {
       var id_cmd = "";
@@ -567,14 +564,17 @@ export default {
       this.$router.push({ name: "Login" });
     },
     sesionCaducada() {
-      Swal.fire({
-        title: "Advertencia!",
-        text: "La sesion ha caducado",
-        icon: "warning",
-        confirmButtonText: "OK"
-      });
+      this.swalMessage('La sesion ha caducado');
       this.$store.commit("SET_PIN", null);
       this.$router.push({ name: "Login" });
+    },
+    swalMessage( msg,title = "Advertencia!", icon = "warning") {
+      Swal.fire({
+        title: title,
+        text: msg,
+        icon: icon,
+        confirmButtonText: "Ok"
+      });
     }
   }
 };
