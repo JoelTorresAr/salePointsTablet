@@ -12,10 +12,9 @@ class MesaController extends Controller
 {
     public function juntar(Request $request)
     {
-        $piso_id = $request['piso_id'];
         $mesa_id = $request['id_mesa'];
         $mesas = $request['mesas'];
-        $id_cmd  = Table::where('id', $mesa_id)->value('command_id');
+        $id_cmd  = $request['id_cmd'];
         DB::beginTransaction();
         try {
             DB::table('tables')->where('id', $mesa_id)->update(
@@ -25,27 +24,84 @@ class MesaController extends Controller
             );
 
             DB::table('tables')
-                ->whereIn('id', [1, 2, 3, 4])
+                ->whereIn('id', $mesas)
                 ->update(
                     [
                         'command_id' => $id_cmd,
-                        'joined' =>  1,
+                        'joined'     =>  1,
+                        'status'     => 'O'
                     ]
                 );
 
             DB::commit();
-            return $this->responseWithMesas($piso_id);
+            return response()->json(['msg' =>  'Ok', 'status' => 1], 200);
             // all good
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['msg' =>  'Ok', 'prod' => $e, 'status' => 0], 200);
+            return response()->json(['msg' =>  $e, 'status' => 0], 200);
         }
     }
     public function separar(Request $request)
     {
+        $mesa_id = $request['id_mesa'];
+        $id_cmd  = $request['id_cmd'];
+        DB::beginTransaction();
+        try {
+            DB::table('tables')
+                ->where('command_id', $id_cmd)
+                ->update(
+                    [
+                        'command_id' => null,
+                        'joined'     =>  0,
+                        'status'     => 'L'
+                    ]
+                );
+
+            DB::table('tables')->where('id', $mesa_id)->update(
+                [
+                    'command_id' => $id_cmd,
+                    'status'     => 'O'
+                ]
+            );
+
+            DB::commit();
+            return response()->json(['msg' =>  'Ok', 'status' => 1], 200);
+            // all good
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['msg' =>  $e, 'status' => 0], 200);
+        }
     }
     public function mover(Request $request)
     {
+        $mesa_id = $request['id_mesa'];
+        $id_cmd  = $request['id_cmd'];
+        DB::beginTransaction();
+        try {
+            DB::table('tables')
+                ->where('command_id', $id_cmd)
+                ->update(
+                    [
+                        'command_id' => null,
+                        'joined'     =>  0,
+                        'status'     => 'L'
+                    ]
+                );
+
+            DB::table('tables')->where('id', $mesa_id)->update(
+                [
+                    'command_id' => $id_cmd,
+                    'status'     => 'O'
+                ]
+            );
+
+            DB::commit();
+            return response()->json(['msg' =>  'Ok', 'status' => 1], 200);
+            // all good
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['msg' =>  $e, 'status' => 0], 200);
+        }
     }
     public function responseWithMesas($piso_id)
     {

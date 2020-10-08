@@ -112,25 +112,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -275,7 +256,6 @@ __webpack_require__.r(__webpack_exports__);
             this.showJoins = !this.showJoins;
             this.moverMesas();
           } else {
-            console.log("mover");
             this.actionButton = "MOVER";
             this.arrayMesas = [];
             this.showJoins = !this.showJoins;
@@ -319,11 +299,11 @@ __webpack_require__.r(__webpack_exports__);
           break;
 
         case "SEPARAR":
-          if (item.juntada === 1) {
+          if (item.juntada == 1) {
             var existe = false;
             var ix;
             this.arrayMesas.forEach(function (e) {
-              if (e.id == index) {
+              if (e.id == item.id) {
                 existe = true;
                 ix = e;
               }
@@ -333,7 +313,7 @@ __webpack_require__.r(__webpack_exports__);
               this.arrayMesas = [];
             } else {
               var mesa = {
-                id: index,
+                id: item.id,
                 id_cmd: item.id_cmd,
                 st_cmd: item.st_cmd,
                 st_join: 1
@@ -350,7 +330,7 @@ __webpack_require__.r(__webpack_exports__);
             var existe = false;
             var ix;
             this.arrayMesas.forEach(function (e) {
-              if (e.id == index) {
+              if (e.id == item.id) {
                 existe = true;
                 ix = e;
               }
@@ -362,10 +342,9 @@ __webpack_require__.r(__webpack_exports__);
             } else {
               if (this.arrayMesas.length < 2) {
                 var mesa = {
-                  id: index,
+                  id: item.id,
                   id_cmd: item.id_cmd,
-                  st_cmd: item.st_cmd,
-                  st_join: 1
+                  st_cmd: item.st_cmd
                 };
                 this.arrayMesas.push(mesa);
               }
@@ -429,7 +408,7 @@ __webpack_require__.r(__webpack_exports__);
           break;
 
         case "SEPARAR":
-          if (this.showJoins & item.juntada === 1) {
+          if (this.showJoins & item.juntada == 1) {
             std = true;
           }
 
@@ -530,7 +509,9 @@ __webpack_require__.r(__webpack_exports__);
       if (cant_cmd == 1) {
         var url = "api/tablet/mesas/juntar";
         axios.post(url, {
-          id: this.mesaId
+          id_mesa: id_mesa,
+          mesas: id_mesas,
+          id_cmd: id_cmd[0]
         }, this.config).then(function (_ref3) {
           var data = _ref3.data;
 
@@ -549,12 +530,12 @@ __webpack_require__.r(__webpack_exports__);
           _this3.arrayMesas = [];
           console.log(error);
         });
-      }
-
-      if (cant_cmd > 1) {
-        this.swalMessage("Seleccione solo una mesa que tenga comanda");
       } else {
-        this.swalMessage("Seleecione al menos una mesa con comanda");
+        if (cant_cmd > 1) {
+          this.swalMessage("Seleccione solo una mesa que tenga comanda");
+        } else {
+          this.swalMessage("Seleecione al menos una mesa con comanda");
+        }
       }
     },
     separarMesas: function separarMesas() {
@@ -569,21 +550,19 @@ __webpack_require__.r(__webpack_exports__);
 
         id_mesa = String(e.id);
       });
-      var url = "".concat(this.ip, "/?nomFun=tb_separar_mesa&parm_id_cmd=").concat(id_cmd, "&parm_id_mesa=").concat(id_mesa, "&parm_tipo=M$");
-      axios.get(url).then(function (_ref4) {
+      var url = "api/tablet/mesas/separar";
+      axios.post(url, {
+        id_mesa: id_mesa,
+        id_cmd: id_cmd
+      }, this.config).then(function (_ref4) {
         var data = _ref4.data;
 
-        if (data.msg == "OK") {
+        if (data.msg == "Ok") {
           _this4.arrayMesas = [];
 
           _this4.getMesas(_this4.pisoActual);
         } else {
-          Swal.fire({
-            title: "Advertencia!",
-            text: data.msg,
-            icon: "warning",
-            confirmButtonText: "Cool"
-          });
+          _this4.swalMessage(data.msg);
 
           _this4.getMesas(_this4.pisoActual);
 
@@ -600,27 +579,25 @@ __webpack_require__.r(__webpack_exports__);
       var id_cmd = "";
       var id_mesa = "";
       this.arrayMesas.forEach(function (e) {
-        if (e.id_cmd != 0) {
+        if (e.id_cmd != null) {
           id_cmd = e.id_cmd;
         } else {
           id_mesa = e.id;
         }
       });
-      var url = "".concat(this.ip, "/?nomFun=tb_mover_mesa&parm_id_cmd=").concat(id_cmd, "&parm_id_mesa=").concat(id_mesa, "&parm_tipo=M$");
-      axios.get(url).then(function (_ref5) {
+      var url = "api/tablet/mesas/mover";
+      axios.post(url, {
+        id_mesa: id_mesa,
+        id_cmd: id_cmd
+      }, this.config).then(function (_ref5) {
         var data = _ref5.data;
 
-        if (data.msg == "OK") {
+        if (data.msg == "Ok") {
           _this5.arrayMesas = [];
 
           _this5.getMesas(_this5.pisoActual);
         } else {
-          Swal.fire({
-            title: "Advertencia!",
-            text: data.msg,
-            icon: "warning",
-            confirmButtonText: "Cool"
-          });
+          _this5.swalMessage(data.msg);
 
           _this5.getMesas(_this5.pisoActual);
 
@@ -638,7 +615,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     sesionCaducada: function sesionCaducada() {
-      this.swalMessage('La sesion ha caducado');
+      this.swalMessage("La sesion ha caducado");
       this.$store.commit("SET_PIN", null);
       this.$router.push({
         name: "Login"
