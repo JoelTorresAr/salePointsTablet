@@ -14,12 +14,12 @@ class FloorSeeder extends Seeder
     public function run()
     {
         $cashBox = CashBox::select('id')->firstOrFail();
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 1; $i < 3; $i++) {
             $cashBox->floors()->Create([
                 'name'    => 'PISO '.$i,
                 'printer' => 'printerOne',
                 'state'   => 'A'
-            ]);
+            ])->save();
         }
     }
 }

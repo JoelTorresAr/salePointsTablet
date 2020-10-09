@@ -123,6 +123,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -150,7 +157,8 @@ __webpack_require__.r(__webpack_exports__);
       numcomen: 0,
       cantidad: 0,
       userID: 0,
-      pin: undefined
+      pin: undefined,
+      disableMinusBtn: false
     };
   },
   computed: {
@@ -267,6 +275,7 @@ __webpack_require__.r(__webpack_exports__);
       var cant = 1;
 
       if (action == "minus") {
+        this.disableMinusBtn = true;
         cant = -1;
       }
 
@@ -275,51 +284,84 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       if (item.print == 1 && action != "plus" && item.increment < 1) {
+        /*
         Swal.fire({
           title: "Advertencia!",
           text: "Esta accion solo la puede ejecutar un administrador",
           icon: "warning",
           confirmButtonText: "OK"
-        });
-      } else {
-        var url = "api/tablet/comanda/item/alterar";
-        axios.post(url, {
-          id_mesa: this.mesaId,
-          id_producto: item.idprod,
-          id_detalle: item.id,
-          cantidad: cant
-        }, this.config).then(function (_ref4) {
-          var data = _ref4.data;
-
-          if (data.msg == "Ok") {
-            _this4.articlesEnMesa = data.prod;
-            _this4.total = data.total;
-          } else {
-            Swal.fire({
-              title: "Advertencia!",
-              text: data.msg,
-              icon: "warning",
-              confirmButtonText: "OK"
-            });
-          }
-        })["catch"](function (error) {
-          if (error.response) {
-            if (error.response.status === 401) {
-              _this4.sesionCaducada();
+        });*/
+        var _Swal$fire$then = Swal.fire({
+          title: "Esta accion requiere autorización",
+          input: "text",
+          inputValue: "",
+          showCancelButton: true,
+          inputValidator: function inputValidator(value) {
+            if (!value) {
+              return "Necesitas ingresar el pin de un administrador!";
             }
-          } else if (error.request) {// console.log(error.request);
-          } else {
-            // console.log("Error", error.message);
-            Swal.fire({
-              title: "Advertencia!",
-              text: error.message.msg,
-              icon: "warning",
-              confirmButtonText: "OK"
-            });
-          } // console.log(error.config);
 
-        });
+            {
+              _this4.consultaAlterarLista(_this4.mesaId, item.idprod, item.id, cant, true, value);
+            }
+          }
+        }).then(function (result) {
+          if (result.dismiss === Swal.DismissReason.cancel) {
+            _this4.disableMinusBtn = false;
+          }
+        }),
+            pin = _Swal$fire$then.value;
+      } else {
+        this.consultaAlterarLista(this.mesaId, item.idprod, item.id, cant);
       }
+    },
+    consultaAlterarLista: function consultaAlterarLista(id_mesa, id_prod, id_detalle, cant) {
+      var _this5 = this;
+
+      var restring = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+      var auth = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : "";
+      var url = "api/tablet/comanda/item/alterar";
+      axios.post(url, {
+        id_mesa: id_mesa,
+        id_producto: id_prod,
+        id_detalle: id_detalle,
+        cantidad: cant,
+        restring: restring,
+        auth: auth
+      }, this.config).then(function (_ref4) {
+        var data = _ref4.data;
+        _this5.disableMinusBtn = false;
+
+        if (data.msg == "Ok") {
+          _this5.articlesEnMesa = data.prod;
+          _this5.total = data.total;
+        } else {
+          Swal.fire({
+            title: "Advertencia!",
+            text: data.msg,
+            icon: "warning",
+            confirmButtonText: "OK"
+          });
+        }
+      })["catch"](function (error) {
+        _this5.disableMinusBtn = false;
+
+        if (error.response) {
+          if (error.response.status === 401) {
+            _this5.sesionCaducada();
+          }
+        } else if (error.request) {// console.log(error.request);
+        } else {
+          // console.log("Error", error.message);
+          Swal.fire({
+            title: "Advertencia!",
+            text: error.message.msg,
+            icon: "warning",
+            confirmButtonText: "OK"
+          });
+        } // console.log(error.config);
+
+      });
     },
     actionButton: function actionButton(val) {
       switch (val) {
@@ -340,7 +382,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     sendKitchen: function sendKitchen() {
-      var _this5 = this;
+      var _this6 = this;
 
       var url = "api/tablet/comanda/imprimir/cocina"; //console.log(url)
 
@@ -363,7 +405,7 @@ __webpack_require__.r(__webpack_exports__);
             confirmButtonText: "OK"
           });
 
-          _this5.salir();
+          _this6.salir();
         } else {
           Swal.fire({
             title: "Advertencia!",
@@ -375,13 +417,13 @@ __webpack_require__.r(__webpack_exports__);
       })["catch"](function (error) {
         if (error.response) {
           if (error.response.status === 401) {
-            _this5.sesionCaducada();
+            _this6.sesionCaducada();
           }
         }
       });
     },
     sendPrecuenta: function sendPrecuenta() {
-      var _this6 = this;
+      var _this7 = this;
 
       var sinEnviarCocina = 0;
       this.articlesEnMesa.forEach(function (element) {
@@ -402,12 +444,12 @@ __webpack_require__.r(__webpack_exports__);
           var data = _ref6.data;
 
           if (data.msg == "OK") {
-            _this6.$router.push({
+            _this7.$router.push({
               name: "Home"
             });
 
-            _this6.articlesEnMesa = data.prod;
-            _this6.total = data.total; // this.salir();
+            _this7.articlesEnMesa = data.prod;
+            _this7.total = data.total; // this.salir();
           } else {
             Swal.fire({
               title: "Advertencia!",
@@ -419,7 +461,7 @@ __webpack_require__.r(__webpack_exports__);
         })["catch"](function (error) {
           if (error.response) {
             if (error.response.status === 401) {
-              _this6.sesionCaducada();
+              _this7.sesionCaducada();
             }
           }
         });
@@ -433,7 +475,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     salir: function salir() {
-      var _this7 = this;
+      var _this8 = this;
 
       var url = "api/tablet/comanda/liberar";
       axios.post(url, {
@@ -442,7 +484,7 @@ __webpack_require__.r(__webpack_exports__);
         var data = _ref7.data;
 
         if (data.msg == "Ok") {
-          _this7.$router.push({
+          _this8.$router.push({
             name: "Home"
           });
         } else {
@@ -453,7 +495,7 @@ __webpack_require__.r(__webpack_exports__);
             confirmButtonText: "OK"
           }).then(function (result) {
             if (result.value) {
-              _this7.$router.push({
+              _this8.$router.push({
                 name: "Home"
               });
             }
@@ -473,6 +515,16 @@ __webpack_require__.r(__webpack_exports__);
       this.$store.commit("SET_PIN", null);
       this.$router.push({
         name: "Login"
+      });
+    },
+    swalMessage: function swalMessage(msg) {
+      var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "Advertencia!";
+      var icon = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "warning";
+      Swal.fire({
+        title: title,
+        text: msg,
+        icon: icon,
+        confirmButtonText: "Ok"
       });
     }
   }
@@ -575,7 +627,8 @@ var render = function() {
                           color: "primary",
                           fab: "",
                           "x-small": "",
-                          dark: ""
+                          dark: "",
+                          disabled: _vm.disableMinusBtn
                         },
                         on: {
                           click: function($event) {
@@ -931,14 +984,15 @@ render._withStripped = true
 /*!**************************************************!*\
   !*** ./resources/js/views/Tablets/Articulos.vue ***!
   \**************************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Articulos_vue_vue_type_template_id_628027f2___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Articulos.vue?vue&type=template&id=628027f2& */ "./resources/js/views/Tablets/Articulos.vue?vue&type=template&id=628027f2&");
 /* harmony import */ var _Articulos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Articulos.vue?vue&type=script&lang=js& */ "./resources/js/views/Tablets/Articulos.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _Articulos_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Articulos.vue?vue&type=style&index=0&lang=css& */ "./resources/js/views/Tablets/Articulos.vue?vue&type=style&index=0&lang=css&");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Articulos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Articulos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _Articulos_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Articulos.vue?vue&type=style&index=0&lang=css& */ "./resources/js/views/Tablets/Articulos.vue?vue&type=style&index=0&lang=css&");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -970,7 +1024,7 @@ component.options.__file = "resources/js/views/Tablets/Articulos.vue"
 /*!***************************************************************************!*\
   !*** ./resources/js/views/Tablets/Articulos.vue?vue&type=script&lang=js& ***!
   \***************************************************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

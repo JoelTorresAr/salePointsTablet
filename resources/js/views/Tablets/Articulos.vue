@@ -4,7 +4,14 @@
       <v-list-item v-for="(item, index) in artList" :key="index" class="pl-2 pr-2">
         <v-list-item-action class="mr-2">
           <div>
-            <v-btn color="primary" fab x-small dark @click="alterList(item,'minus')">
+            <v-btn
+              color="primary"
+              fab
+              x-small
+              dark
+              :disabled="disableMinusBtn"
+              @click="alterList(item,'minus')"
+            >
               <v-icon>mdi-minus</v-icon>
             </v-btn>
             {{item.cant}}
@@ -134,7 +141,8 @@ export default {
     numcomen: 0,
     cantidad: 0,
     userID: 0,
-    pin: undefined
+    pin: undefined,
+    disableMinusBtn: false
   }),
   computed: {
     artList() {
@@ -260,63 +268,104 @@ export default {
     alterList(item, action) {
       var cant = 1;
       if (action == "minus") {
+        this.disableMinusBtn = true;
         cant = -1;
       }
       if (action == "remove") {
         cant = 0;
       }
       if (item.print == 1 && action != "plus" && item.increment < 1) {
+        /*
         Swal.fire({
           title: "Advertencia!",
           text: "Esta accion solo la puede ejecutar un administrador",
           icon: "warning",
           confirmButtonText: "OK"
+        });*/
+        const { value: pin } = Swal.fire({
+          title: "Esta accion requiere autorización",
+          input: "text",
+          inputValue: "",
+          showCancelButton: true,
+          inputValidator: value => {
+            if (!value) {
+              return "Necesitas ingresar el pin de un administrador!";
+            }
+            {
+              this.consultaAlterarLista(
+                this.mesaId,
+                item.idprod,
+                item.id,
+                cant,
+                true,
+                value
+              );
+            }
+          }
+        }).then(result => {
+          if (result.dismiss === Swal.DismissReason.cancel) {
+            this.disableMinusBtn = false;
+          }
         });
       } else {
-        var url = `api/tablet/comanda/item/alterar`;
-        axios
-          .post(
-            url,
-            {
-              id_mesa: this.mesaId,
-              id_producto: item.idprod,
-              id_detalle: item.id,
-              cantidad: cant
-            },
-            this.config
-          )
-          .then(({ data }) => {
-            if (data.msg == "Ok") {
-              this.articlesEnMesa = data.prod;
-              this.total = data.total;
-            } else {
-              Swal.fire({
-                title: "Advertencia!",
-                text: data.msg,
-                icon: "warning",
-                confirmButtonText: "OK"
-              });
-            }
-          })
-          .catch(error => {
-            if (error.response) {
-              if (error.response.status === 401) {
-                this.sesionCaducada();
-              }
-            } else if (error.request) {
-              // console.log(error.request);
-            } else {
-              // console.log("Error", error.message);
-              Swal.fire({
-                title: "Advertencia!",
-                text: error.message.msg,
-                icon: "warning",
-                confirmButtonText: "OK"
-              });
-            }
-            // console.log(error.config);
-          });
+        this.consultaAlterarLista(this.mesaId, item.idprod, item.id, cant);
       }
+    },
+    consultaAlterarLista(
+      id_mesa,
+      id_prod,
+      id_detalle,
+      cant,
+      restring = false,
+      auth = ""
+    ) {
+      var url = `api/tablet/comanda/item/alterar`;
+      axios
+        .post(
+          url,
+          {
+            id_mesa: id_mesa,
+            id_producto: id_prod,
+            id_detalle: id_detalle,
+            cantidad: cant,
+            restring: restring,
+            auth: auth
+          },
+          this.config
+        )
+        .then(({ data }) => {
+          this.disableMinusBtn = false;
+          if (data.msg == "Ok") {
+            this.articlesEnMesa = data.prod;
+            this.total = data.total;
+          } else {
+            Swal.fire({
+              title: "Advertencia!",
+              text: data.msg,
+              icon: "warning",
+              confirmButtonText: "OK"
+            });
+          }
+        })
+        .catch(error => {
+          this.disableMinusBtn = false;
+          if (error.response) {
+            if (error.response.status === 401) {
+              this.sesionCaducada();
+            }
+          } else if (error.request) {
+            // console.log(error.request);
+          } else {
+            // console.log("Error", error.message);
+            Swal.fire({
+              title: "Advertencia!",
+              text: error.message.msg,
+              icon: "warning",
+              confirmButtonText: "OK"
+            });
+          }
+          // console.log(error.config);
+        });
     },
     actionButton(val) {
       switch (val) {
@@ -423,7 +472,8 @@ export default {
       } else {
         Swal.fire({
           title: "Advertencia!",
-          text: "Tiene detalles sin eliminar a cocina, eliminelos o envielos a cocina",
+          text:
+            "Tiene detalles sin eliminar a cocina, eliminelos o envielos a cocina",
           icon: "warning",
           confirmButtonText: "OK"
         });
@@ -468,6 +518,14 @@ export default {
       });
       this.$store.commit("SET_PIN", null);
       this.$router.push({ name: "Login" });
+    },
+    swalMessage(msg, title = "Advertencia!", icon = "warning") {
+      Swal.fire({
+        title: title,
+        text: msg,
+        icon: icon,
+        confirmButtonText: "Ok"
+      });
     }
   }
 };

@@ -8,6 +8,7 @@ use App\Models\CommandMenu;
 use App\Models\Floor;
 use App\Models\Menu;
 use App\Models\Table;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -121,22 +122,22 @@ class CommandController extends Controller
         $id_cmd = Table::where('id', $request['id_mesa'])->value('command_id');
         $nota = $request['nota'];
 
-            DB::beginTransaction();
-            try {
-                DB::table('notes')->insertGetId(
-                    [
-                        'command_id'   => $id_cmd,
-                        'note'         => $nota,
-                    ]
-                );
+        DB::beginTransaction();
+        try {
+            DB::table('notes')->insertGetId(
+                [
+                    'command_id'   => $id_cmd,
+                    'note'         => $nota,
+                ]
+            );
 
-                DB::commit();
-                return response()->json(['msg' =>  'OK', 'status' => 1], 200);
-                // all good
-            } catch (\Exception $e) {
-                DB::rollback();
-                return response()->json(['msg' =>  $e, 'status' => 0], 200);
-            }
+            DB::commit();
+            return response()->json(['msg' =>  'OK', 'status' => 1], 200);
+            // all good
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['msg' =>  $e, 'status' => 0], 200);
+        }
     }
     public function agregarItem(Request $request)
     {
@@ -162,22 +163,32 @@ class CommandController extends Controller
         $item = Menu::where('id', $request['id_producto'])->first();
         $id_detalle = $request['id_detalle'];
         $cant    = $request['cantidad'];
+        $restring = $request['restring'];
+        $auth = $request['auth'];
         switch ($cant) {
             case 1:
                 return $this->incrementarItemDetalle($id_detalle, $id_cmd, $item);
                 break;
             case 0:
                 $detalle = CommandMenu::where('id', $id_detalle)->first();
-                return $this->eliminarItemDetalle($detalle, $id_cmd);
+                return $this->eliminarItemDetalle($detalle, $id_cmd,$restring, $auth);
                 break;
 
             default:
                 $detalle = CommandMenu::where('id', $id_detalle)->first();
                 if ($detalle['print_status'] == 1 && $detalle['increment'] == 0) {
-                    return response()->json(['msg' =>  'Esta accion solo la puede hacer un administrador', 'status' => 0], 200);
+                    if ($restring) {
+                        if (!$user = User::select('id', 'name')->where([['pin', $auth], ['state', 'A']])->first()) {
+                            return  response()->json(['msg' => 'Acceso no autorizado(user)'], 200);
+                        }
+                        if (!$user->hasRole('administrador')) {
+                            return  response()->json(['msg' => 'Acceso no autorizado'], 200);
+                        }
+                    }
+                  //  return response()->json(['msg' =>  'Esta accion solo la puede hacer un administrador', 'status' => 0], 200);
                 }
                 if ($detalle->quantity == 1) {
-                    return $this->eliminarItemDetalle($detalle, $id_cmd);
+                    return $this->eliminarItemDetalle($detalle, $id_cmd,$restring, $auth);
                 } else {
                     return $this->disminuirItemDetalle($id_detalle, $id_cmd, $item);
                 }
@@ -298,8 +309,17 @@ class CommandController extends Controller
             return response()->json(['msg' =>  $e, 'status' => 0], 200);
         }
     }
-    protected function eliminarItemDetalle($detalle, $id_cmd)
+    protected function eliminarItemDetalle($detalle, $id_cmd,$restring, $auth)
     {
+        
+        if ($restring) {
+            if (!$user = User::select('id', 'name')->where([['pin', $auth], ['state', 'A']])->first()) {
+                return  response()->json(['msg' => 'Acceso no autorizado(user)'], 200);
+            }
+            if (!$user->hasRole('administrador')) {
+                return  response()->json(['msg' => 'Acceso no autorizado'], 200);
+            }
+        }
         DB::beginTransaction();
         try {
             DB::table('commands')->where('id', $id_cmd)->update(

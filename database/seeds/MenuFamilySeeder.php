@@ -24,12 +24,13 @@ class MenuFamilySeeder extends Seeder
             'name'    => 'Cocina',
             'shop_id' => 1
         ]);
-        $menu_families = ['POLLOS A LA BRASA', 'BEBIDAS', 'GUARNICIONES', 'PARRILAS', 'ADICIONALES'];
+        $menu_families = ['CEVICHES', 'LECHES Y CHILCANOS', 'RONDAS MARINAS', 'FRITURAS', 'JALEAS','TIRADITOS','ARROCES','PARIHUELAS','SUDADOS','CHICHARRONES','GUARNICIONES','BEBIDAS','C. CRIOLLA'];
         foreach ($menu_families as $value) {
             MenuFamily::create([
                 'name'   => $value
-            ]);
+            ])->save();
         }
+        /*
         $warehouse_families = ['POLLO', 'VEGETALES','ABRARROTES' , 'COMPLEMENTOS', 'CARNES', 'GASEOSAS', 'AGUAS', 'LICORES'];
         foreach ($warehouse_families as $value) {
             WarehouseFamily::create([
@@ -101,7 +102,7 @@ class MenuFamilySeeder extends Seeder
                 'supply_id'         => 4,
                 'current_quantity'  => 300,
             ]
-        );
+        );*/
          
     }
 }

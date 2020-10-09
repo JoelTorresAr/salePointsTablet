@@ -21,7 +21,7 @@ class CreateMenusTable extends Migration
             $table->decimal('sub_total',17,2);
             $table->decimal('igv',17,2);
             $table->decimal('total',17,2);
-            $table->string('state',1);
+            $table->string('state',1)->default('A');
             $table->unsignedBigInteger('shop_id');
 
             $table->foreign('menu_family_id')->references('id')->on('menu_families')

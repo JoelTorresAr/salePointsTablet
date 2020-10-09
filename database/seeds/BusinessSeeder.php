@@ -14,11 +14,11 @@ class BusinessSeeder extends Seeder
     {
         Business::create([
             'ruc' => '12345678921',
-            'social_reason' => 'Parillas y carnes S.A.',
-            'telephone' => '123456789',
+            'social_reason' => 'Che Limon',
+            'telephone' => '902588583',
             'email' =>  'prueba@hotmail.com',
-            'fiscal_address' => 'Av. Prueba #123',
-            'commercial_address' => 'Av. Prueba #321',
+            'fiscal_address' => 'Diego Ferre #285',
+            'commercial_address' => 'Diego Ferre #285',
             'state' => 'A',
         ]);
     }

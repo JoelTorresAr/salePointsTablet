@@ -103,25 +103,4 @@ class MesaController extends Controller
             return response()->json(['msg' =>  $e, 'status' => 0], 200);
         }
     }
-    public function responseWithMesas($piso_id)
-    {
-        $tables = DB::table('tables')
-            ->leftJoin('commands', 'commands.id', '=', 'tables.command_id')
-            ->where([['tables.floor_id', $piso_id], ['tables.state', 'A']])
-            ->select(
-                'tables.id as id',
-                'tables.name as nombre',
-                'tables.status as st_mesa',
-                'commands.state as st_cmd',
-                'commands.id as id_cmd',
-                'tables.joined as juntada',
-                'tables.order_status as orden',
-                'commands.editing_by_name as mesero',
-            )
-            ->orderBy('tables.name')
-            //->whereNull('commands.admin_id')
-            ->get();
-
-        return response()->json(['mesas' =>  $tables], 200);
-    }
 }

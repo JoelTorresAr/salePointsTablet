@@ -13,12 +13,10 @@ class AssignUsertoShopSeeder extends Seeder
      */
     public function run()
     {
-        $user =  User::select('id','name')->where('id',1)->first();
-        $shop = Shop::select('id')->first();
-
-        $shop->users()->attach($user);
-        $user =  User::select('id','name')->where('id',2)->first();
-        $shop->users()->attach($user);
-
+        for ($i = 1; $i < 4; $i++) {
+            $user =  User::select('id', 'name')->where('id', $i)->first();
+            $shop = Shop::select('id')->first();
+            $shop->users()->attach($user);
+        }
     }
 }

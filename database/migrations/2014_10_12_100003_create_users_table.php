@@ -18,7 +18,7 @@ class CreateUsersTable extends Migration
             $table->unsignedBigInteger('business_id')->nullable();
             $table->string('name');
             $table->string('password')->nullable();
-            $table->string('pin')->nullable();
+            $table->string('pin')->unique()->nullable();
             $table->string('state');
             $table->rememberToken();
 

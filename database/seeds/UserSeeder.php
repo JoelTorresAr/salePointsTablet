@@ -26,5 +26,10 @@ class UserSeeder extends Seeder
             'pin'         => '5454',
             'state'      => 'A'
         ]);
+        $business->users()->Create([
+            'name'        => 'EFRAIN',
+            'pin'         => '6666',
+            'state'      => 'A'
+        ]);
     }
 }
