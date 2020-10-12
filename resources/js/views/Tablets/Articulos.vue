@@ -267,48 +267,26 @@ export default {
     },
     alterList(item, action) {
       var cant = 1;
-      if (action == "minus") {
-        this.disableMinusBtn = true;
-        cant = -1;
-      }
-      if (action == "remove") {
-        cant = 0;
-      }
-      if (item.print == 1 && action != "plus" && item.increment < 1) {
-        /*
-        Swal.fire({
-          title: "Advertencia!",
-          text: "Esta accion solo la puede ejecutar un administrador",
-          icon: "warning",
-          confirmButtonText: "OK"
-        });*/
-        const { value: pin } = Swal.fire({
-          title: "Esta accion requiere autorización",
-          input: "text",
-          inputValue: "",
-          showCancelButton: true,
-          inputValidator: value => {
-            if (!value) {
-              return "Necesitas ingresar el pin de un administrador!";
-            }
-            {
-              this.consultaAlterarLista(
-                this.mesaId,
-                item.idprod,
-                item.id,
-                cant,
-                true,
-                value
-              );
-            }
+      switch (action) {
+        case "minus":
+          this.disableMinusBtn = true;
+          cant = -1;
+          if (item.print == 1 && item.increment < 1) {
+            this.swalValidator(this.mesaId, item.idprod, item.id, cant);
+          } else {
+            this.consultaAlterarLista(this.mesaId, item.idprod, item.id, cant);
           }
-        }).then(result => {
-          if (result.dismiss === Swal.DismissReason.cancel) {
-            this.disableMinusBtn = false;
+          break;
+        case "remove":
+          cant = 0;
+          if (action == "remove" && item.print == 1) {
+            this.swalValidator(this.mesaId, item.idprod, item.id, cant);
+          } else {
+            this.consultaAlterarLista(this.mesaId, item.idprod, item.id, cant);
           }
-        });
-      } else {
-        this.consultaAlterarLista(this.mesaId, item.idprod, item.id, cant);
+          break;
+        default:
+           this.consultaAlterarLista(this.mesaId, item.idprod, item.id, cant);
       }
     },
     consultaAlterarLista(
@@ -525,6 +503,33 @@ export default {
         text: msg,
         icon: icon,
         confirmButtonText: "Ok"
+      });
+    },
+    swalValidator(id_mesa, id_prod, id_detall, cant) {
+      const { value: pin } = Swal.fire({
+        title: "Esta accion requiere autorización",
+        input: "text",
+        inputValue: "",
+        showCancelButton: true,
+        inputValidator: value => {
+          if (!value) {
+            return "Necesitas ingresar el pin de un administrador!";
+          }
+          {
+            this.consultaAlterarLista(
+              id_mesa,
+              id_prod,
+              id_detall,
+              cant,
+              true,
+              value
+            );
+          }
+        }
+      }).then(result => {
+        if (result.dismiss === Swal.DismissReason.cancel) {
+          this.disableMinusBtn = false;
+        }
       });
     }
   }

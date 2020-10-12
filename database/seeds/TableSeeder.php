@@ -16,7 +16,7 @@ class TableSeeder extends Seeder
         $arrayStatus = ['L','O'];
         $floors = Floor::get();
         foreach ($floors as $key => $floor) {
-            for ($i=0; $i < 8; $i++) { 
+            for ($i=1; $i < 8; $i++) { 
                 $floor->tables()->Create([
                     'name'   => 'Mesa 0'.$i,
                     'state'  => $array[array_rand($array, 1)],

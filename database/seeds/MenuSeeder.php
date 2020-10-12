@@ -204,7 +204,7 @@ class MenuSeeder extends Seeder
         ];
         $JALEAS = [
             [
-                'name'      => 'Seño de sipan',
+                'name'      => 'Señor de sipan',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
