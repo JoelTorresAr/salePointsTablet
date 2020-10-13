@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Tablet;
 
+use App\Events\CommandBinnacle;
 use App\Http\Controllers\Controller;
+use App\Jobs\CreateCommandBinnacle;
 use App\Models\Command;
 use App\Models\CommandMenu;
 use App\Models\Floor;
 use App\Models\Menu;
 use App\Models\Table;
 use App\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -62,8 +65,10 @@ class CommandController extends Controller
             /**
              * la mesa no tiene comandas registradas
              */
-            $piso = Floor::where('id', $mesa['floor_id'])->first();
-            DB::transaction(function () use ($piso, $mesa, $mozo) {
+
+            DB::beginTransaction();
+            try {
+                $piso = Floor::where('id', $mesa['floor_id'])->first();
                 $id_cmd = DB::table('commands')->insertGetId(
                     [
                         'cash_box_id'       => $piso['cash_box_id'],
@@ -82,8 +87,15 @@ class CommandController extends Controller
                         'order_status' => 1,
                         'original_cmd' => 'A'
                     ]);
-            });
-            return response()->json(['msg' =>  'OK', 'status' => 1], 200);
+
+                DB::commit();
+                dispatch(new CreateCommandBinnacle('C', $id_cmd, $mozo['id'], 'CREACION'));
+                // event(new CommandBinnacle('CREACION', $id_cmd, $mozo['id'], ''));
+                return response()->json(['msg' =>  'OK', 'status' => 1], 200);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['msg' => $e, 'status' => 0, 'tipo' => 'db'], 200);
+            }
         } else {
             $comanda = Command::where('id', $mesa['command_id'])->first();
             if ($comanda->state == 3) {
@@ -108,6 +120,7 @@ class CommandController extends Controller
                     );
 
                     DB::commit();
+                    dispatch(new CreateCommandBinnacle('A', $mesa['command_id'], $mozo['id'], 'INGRESO'));
                     return response()->json(['msg' =>  'OK', 'status' => 1], 200);
                     // all good
                 } catch (\Exception $e) {
@@ -171,7 +184,7 @@ class CommandController extends Controller
                 break;
             case 0:
                 $detalle = CommandMenu::where('id', $id_detalle)->first();
-                return $this->eliminarItemDetalle($detalle, $id_cmd,$restring, $auth);
+                return $this->eliminarItemDetalle($detalle, $id_cmd, $restring, $auth);
                 break;
 
             default:
@@ -185,10 +198,10 @@ class CommandController extends Controller
                             return  response()->json(['msg' => 'Acceso no autorizado'], 200);
                         }
                     }
-                  //  return response()->json(['msg' =>  'Esta accion solo la puede hacer un administrador', 'status' => 0], 200);
+                    //  return response()->json(['msg' =>  'Esta accion solo la puede hacer un administrador', 'status' => 0], 200);
                 }
                 if ($detalle->quantity == 1) {
-                    return $this->eliminarItemDetalle($detalle, $id_cmd,$restring, $auth);
+                    return $this->eliminarItemDetalle($detalle, $id_cmd, $restring, $auth);
                 } else {
                     return $this->disminuirItemDetalle($id_detalle, $id_cmd, $item);
                 }
@@ -309,9 +322,9 @@ class CommandController extends Controller
             return response()->json(['msg' =>  $e, 'status' => 0], 200);
         }
     }
-    protected function eliminarItemDetalle($detalle, $id_cmd,$restring, $auth)
+    protected function eliminarItemDetalle($detalle, $id_cmd, $restring, $auth)
     {
-        
+
         if ($restring) {
             if (!$user = User::select('id', 'name')->where([['pin', $auth], ['state', 'A']])->first()) {
                 return  response()->json(['msg' => 'Acceso no autorizado(user)'], 200);

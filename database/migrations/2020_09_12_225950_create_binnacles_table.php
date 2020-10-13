@@ -18,6 +18,7 @@ class CreateBinnaclesTable extends Migration
             $table->string('operation',1);
             $table->unsignedBigInteger('user_id');
             $table->string('table');
+            $table->string('details');
             $table->dateTime('date_time')->useCurrent();
         });
     }

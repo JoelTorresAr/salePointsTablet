@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Http\Controllers\Controller;
+use App\Jobs\CreateBinnacle;
 use App\Models\CashBox;
 use App\Models\MenuFamily;
 use App\Models\Opening;
@@ -37,6 +38,8 @@ class PinAuthController extends Controller
         if (!$user = User::select('id', 'name')->where([['pin', $pin], ['state', 'A']])->first()) {
             return  response()->json(['msg' => 'Acceso no autorizado(user)'], 401);
         }
+
+        dispatch(new CreateBinnacle('A', 'USER',$user['id'],  'LOGEO'));
 
         if (!$shop = $user->shops()->where([['shops.id', $shop_id], ['state', 'A']])->first()) {
             return  response()->json(['msg' => 'Acceso no autorizado(tienda)'], 401);

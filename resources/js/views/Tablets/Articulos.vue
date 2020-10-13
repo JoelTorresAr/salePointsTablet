@@ -286,7 +286,7 @@ export default {
           }
           break;
         default:
-           this.consultaAlterarLista(this.mesaId, item.idprod, item.id, cant);
+          this.consultaAlterarLista(this.mesaId, item.idprod, item.id, cant);
       }
     },
     consultaAlterarLista(
@@ -373,6 +373,7 @@ export default {
             id_mesa: this.mesaId,
             mesa: this.mesa.nombre,
             mozo: user,
+            user_id: this.userID,
             tipo: "cocina",
             shop_id: store_id
           },
@@ -421,6 +422,7 @@ export default {
               id_mesa: this.mesaId,
               mesa: this.mesa.nombre,
               mozo: user,
+              user_id: this.userID,
               tipo: "precuenta"
             },
             this.config

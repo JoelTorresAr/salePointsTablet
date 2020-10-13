@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tablet;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CreateCommandBinnacle;
 use App\Jobs\WarehouseDecrement;
 use App\Models\Command;
 use App\Models\Table;
@@ -19,6 +20,7 @@ class TicketController extends Controller
     {
         $mozo = $request['mozo'];
         $shop_id = $request['shop_id'];
+        $user_id = $request['user_id'];
         $id_cmd = Table::where('id', $request['id_mesa'])->value('command_id');
         $items = DB::table('command_menu')
             ->leftJoin('menus', 'menus.id', '=', 'command_menu.menu_id')
@@ -49,7 +51,7 @@ class TicketController extends Controller
                 $detalles_alterados++;
             }
         };
-        $detalles = ['mesa' => $request->mesa, 'shop_id' => $shop_id, 'notas' => $notes];
+        $detalles = ['mesa' => $request->mesa, 'shop_id' => $shop_id, 'notas' => $notes,'user_id' => $user_id];
 
         //Verifica que la comanda tenga detalles
         if ($detalles_sin_imprimir == 0 && $detalles_alterados == 0) {
@@ -62,11 +64,12 @@ class TicketController extends Controller
     public function precuenta(Request $request)
     {
         $mozo = $request['mozo'];
+        $user_id = $request['user_id'];
         $id_cmd = Table::where('id', $request['id_mesa'])->value('command_id');
         //$command = Command::where([['id', $id_cmd], ['state', '=', 2]])->first();
         $command = Command::where('id', $id_cmd)->first();
         if ($command->state == 2) {
-            $detalles = ['mesa' => $request->mesa];
+            $detalles = ['mesa' => $request->mesa,'user_id'=>$user_id];
             $items = DB::table('command_menu')
                 ->leftJoin('menus', 'menus.id', '=', 'command_menu.menu_id')
                 ->where([['command_menu.command_id', $id_cmd], ['command_menu.state', 'A']])
@@ -113,6 +116,7 @@ class TicketController extends Controller
             );
             //WarehouseDecrement::dispatch($id_cmd, $detalles['shop_id']);
             dispatch(new WarehouseDecrement($id_cmd, $detalles['shop_id']));
+            dispatch(new CreateCommandBinnacle('A', $id_cmd, $detalles['user_id'], 'IMPRIMIO EN COCINA'));
             DB::commit();
         } catch (Exception $e) {
             DB::rollback();
@@ -208,6 +212,7 @@ class TicketController extends Controller
                 ]
             );
 
+            dispatch(new CreateCommandBinnacle('A', $command->id, $detalles['user_id'], 'IMPRIMIO PRECUENTA'));
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
