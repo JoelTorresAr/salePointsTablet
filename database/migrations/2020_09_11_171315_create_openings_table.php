@@ -37,6 +37,7 @@ class CreateOpeningsTable extends Migration
             //$table->unsignedBigInteger('retire_arching_id')->nullable();
             $table->unsignedBigInteger('left_arching_id')->nullable();
             $table->string('state',1);
+            $table->decimal('credit_charge',17,2);
 
             $table->foreign('cash_box_id')->references('id')->on('cash_boxes')
             ->onDelete('cascade')

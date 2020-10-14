@@ -15,7 +15,7 @@ class CreateChargesTable extends Migration
     {
         Schema::create('charges', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('command_id');
+            $table->foreignId('command_id')->constrained();
             $table->decimal('value',17,2);
             $table->text('description');
             $table->dateTime('date_time',0)->useCurrent();
