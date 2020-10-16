@@ -692,7 +692,8 @@ class MenuSeeder extends Seeder
                 'sub_total'      => $value['sub_total'],
                 'igv'            => $value['igv'],
                 'total'          => $value['total'],
-                'shop_id'        => 1
+                'shop_id'        => 1,
+                'orden'          => 1
             ]);
         }
         foreach ($PARIHUELAS as $key => $value) {
@@ -703,7 +704,8 @@ class MenuSeeder extends Seeder
                 'sub_total'      => $value['sub_total'],
                 'igv'            => $value['igv'],
                 'total'          => $value['total'],
-                'shop_id'        => 1
+                'shop_id'        => 1,
+                'orden'          => 2
             ]);
         }
         foreach ($ARROCES as $key => $value) {
@@ -714,7 +716,8 @@ class MenuSeeder extends Seeder
                 'sub_total'      => $value['sub_total'],
                 'igv'            => $value['igv'],
                 'total'          => $value['total'],
-                'shop_id'        => 1
+                'shop_id'        => 1,
+                'orden'          => 3
             ]);
         }
         foreach ($CHICHARRONES as $key => $value) {
@@ -725,7 +728,8 @@ class MenuSeeder extends Seeder
                 'sub_total'      => $value['sub_total'],
                 'igv'            => $value['igv'],
                 'total'          => $value['total'],
-                'shop_id'        => 1
+                'shop_id'        => 1,
+                'orden'          => 4
             ]);
         }
         foreach ($BEBIDAS as $key => $value) {
@@ -736,7 +740,8 @@ class MenuSeeder extends Seeder
                 'sub_total'      => $value['sub_total'],
                 'igv'            => $value['igv'],
                 'total'          => $value['total'],
-                'shop_id'        => 1
+                'shop_id'        => 1,
+                'orden'          => 5
             ]);
         }
         foreach ($SUDADOS as $key => $value) {
@@ -747,7 +752,8 @@ class MenuSeeder extends Seeder
                 'sub_total'      => $value['sub_total'],
                 'igv'            => $value['igv'],
                 'total'          => $value['total'],
-                'shop_id'        => 1
+                'shop_id'        => 1,
+                'orden'          => 5
             ]);
         }
         foreach ($CARTA as $key => $value) {
@@ -758,7 +764,8 @@ class MenuSeeder extends Seeder
                 'sub_total'      => $value['sub_total'],
                 'igv'            => $value['igv'],
                 'total'          => $value['total'],
-                'shop_id'        => 1
+                'shop_id'        => 1,
+                'orden'          => 5
             ]);
         }
         foreach ($GUARNICIONES as $key => $value) {
@@ -769,7 +776,8 @@ class MenuSeeder extends Seeder
                 'sub_total'      => $value['sub_total'],
                 'igv'            => $value['igv'],
                 'total'          => $value['total'],
-                'shop_id'        => 1
+                'shop_id'        => 1,
+                'orden'          => 5
             ]);
         }
         foreach ($OTROS as $key => $value) {
@@ -780,7 +788,8 @@ class MenuSeeder extends Seeder
                 'sub_total'      => $value['sub_total'],
                 'igv'            => $value['igv'],
                 'total'          => $value['total'],
-                'shop_id'        => 1
+                'shop_id'        => 1,
+                'orden'          => 5
             ]);
         }
     }
