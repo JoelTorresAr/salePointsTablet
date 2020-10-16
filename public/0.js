@@ -377,6 +377,7 @@ __webpack_require__.r(__webpack_exports__);
         id_mesa: this.mesaId,
         mesa: this.mesa.nombre,
         mozo: user,
+        user_id: this.userID,
         tipo: "cocina",
         shop_id: store_id
       }, this.config).then(function (_ref5) {
@@ -424,6 +425,7 @@ __webpack_require__.r(__webpack_exports__);
           id_mesa: this.mesaId,
           mesa: this.mesa.nombre,
           mozo: user,
+          user_id: this.userID,
           tipo: "precuenta"
         }, this.config).then(function (_ref6) {
           var data = _ref6.data;

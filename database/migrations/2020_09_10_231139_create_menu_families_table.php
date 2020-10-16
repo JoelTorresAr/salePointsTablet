@@ -17,6 +17,8 @@ class CreateMenuFamiliesTable extends Migration
             $table->id();
             $table->string('name',50);
             $table->string('state',1)->default('A');
+            $table->integer('orden')->default(5);
+
         });
     }
 

@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call(MenuSeeder::class);
         $this->call(TableSeeder::class);
         $this->call(ArchingSeeder::class);
-     //   $this->call(OpeningSeeder::class);
+        $this->call(OpeningSeeder::class);
         $this->call(CommandTypeSeeder::class);
     }
 }

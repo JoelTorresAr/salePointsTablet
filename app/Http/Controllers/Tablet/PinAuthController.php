@@ -39,7 +39,7 @@ class PinAuthController extends Controller
             return  response()->json(['msg' => 'Acceso no autorizado(user)'], 401);
         }
 
-        dispatch(new CreateBinnacle('A', 'USER',$user['id'],  'LOGEO'));
+        dispatch(new CreateBinnacle('A', 'USER', $user['id'],  'LOGEO'));
 
         if (!$shop = $user->shops()->where([['shops.id', $shop_id], ['state', 'A']])->first()) {
             return  response()->json(['msg' => 'Acceso no autorizado(tienda)'], 401);
@@ -56,7 +56,7 @@ class PinAuthController extends Controller
         }
 
         try {
-           /* if($mozo = auth('api')->user()) {
+            /* if($mozo = auth('api')->user()) {
                 //JWTAuth::manager()->invalidate(new \Tymon\JWTAuth\Token($tokenString), $forceForever = false);
                 JWTAuth::invalidate($token);
             }*/
@@ -112,8 +112,10 @@ class PinAuthController extends Controller
     protected function respondWithToken($token, $user, $shop, $cash_box, $opening)
     {
         $families = MenuFamily::with(['menus' => function ($query) use ($shop) {
-            $query->where([['shop_id', $shop['id']], ['menus.state', 'A']]);
-        }])->get();
+            $query->where([['shop_id', $shop['id']], ['menus.state', 'A']])->orderBy('menus.orden');
+        }])
+        ->orderBy('menu_families.orden')
+        ->get();
 
         foreach ($families as $key => $family) {
             if (count($family['menus']) == 0) {

@@ -23,6 +23,7 @@ class CreateMenusTable extends Migration
             $table->decimal('total',17,2);
             $table->string('state',1)->default('A');
             $table->unsignedBigInteger('shop_id');
+            $table->integer('orden')->default(5);
 
             $table->foreign('menu_family_id')->references('id')->on('menu_families')
             ->onDelete('cascade')
