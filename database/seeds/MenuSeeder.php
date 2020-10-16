@@ -15,7 +15,6 @@ class MenuSeeder extends Seeder
     public function run()
     {
 
-        $menu_families = ['CEVICHES', 'LECHES Y CHILCANOS', 'RONDAS MARINAS', 'FRITURAS', 'JALEAS', 'TIRADITOS', 'ARROCES', 'PARIHUELAS', 'SUDADOS', 'CHICHARRONES', 'GUARNICIONES', 'BEBIDAS', 'C. CRIOLLA'];
         $CEVICHES = [
             [
                 'printer'   => 'cocina',
@@ -52,14 +51,6 @@ class MenuSeeder extends Seeder
             [
                 'printer'   => 'cocina',
                 'name'      => 'Conchas negras',
-                'sub_total' => 25,
-                'igv'       => 0,
-                'total'     => 25,
-                'shop_id'   => 1
-            ],
-            [
-                'printer'   => 'cocina',
-                'name'      => 'Ciclon norteño (c/ crema de rocoto)',
                 'sub_total' => 25,
                 'igv'       => 0,
                 'total'     => 25,
@@ -105,8 +96,36 @@ class MenuSeeder extends Seeder
                 'total'     => 20,
                 'shop_id'   => 1
             ],
-        ];
-        $CHILCANOS = [
+            [
+                'name'      => 'Ronda Mi Che',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+            [
+                'name'      => 'Trío mi che',
+                'sub_total' => 45,
+                'igv'       => 0,
+                'total'     => 45,
+            ],
+            [
+                'name'      => 'Duo mi che',
+                'sub_total' => 35,
+                'igv'       => 0,
+                'total'     => 35,
+            ],
+            [
+                'name'      => 'Tiradito a la crema amarilla',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+            [
+                'name'      => 'Tiradito al  limón',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
             [
                 'name'      => 'Leche mi Che Limón',
                 'sub_total' => 20,
@@ -120,16 +139,56 @@ class MenuSeeder extends Seeder
                 'total'     => 20,
             ],
             [
-                'name'      => 'Leche de pantera',
-                'sub_total' => 18,
-                'igv'       => 0,
-                'total'     => 18,
-            ],
-            [
                 'name'      => 'Leche de tigre',
                 'sub_total' => 15,
                 'igv'       => 0,
                 'total'     => 15,
+            ],
+        ];
+        $PARIHUELAS = [
+            [
+                'name'      => 'Reconciliadora',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+            [
+                'name'      => 'Mero',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+            [
+                'name'      => 'Cabrilla',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+            [
+                'name'      => 'Congrio',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+            [
+                'name'      => 'Tollo mediano',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+            [
+                'name'      => 'Tollo familiar',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+        ];
+        $CARTA = [
+            [
+                'name'      => 'Leche de pantera',
+                'sub_total' => 18,
+                'igv'       => 0,
+                'total'     => 18,
             ],
             [
                 'name'      =>  'Clasico chiclano',
@@ -149,28 +208,14 @@ class MenuSeeder extends Seeder
                 'igv'       => 0,
                 'total'     => 20,
             ],
-        ];
-        $RONDAS = [
             [
-                'name'      => 'Ronda Mi Che',
-                'sub_total' => 50,
+                'printer'   => 'cocina',
+                'name'      => 'Ciclon norteño (c/ crema de rocoto)',
+                'sub_total' => 25,
                 'igv'       => 0,
-                'total'     => 50,
+                'total'     => 25,
+                'shop_id'   => 1
             ],
-            [
-                'name'      => 'Trío mi che',
-                'sub_total' => 45,
-                'igv'       => 0,
-                'total'     => 45,
-            ],
-            [
-                'name'      => 'Duo mi che',
-                'sub_total' => 35,
-                'igv'       => 0,
-                'total'     => 35,
-            ],
-        ];
-        $FRITURAS = [
             [
                 'name'      => 'Cabrilla a lo macho',
                 'sub_total' => 50,
@@ -201,9 +246,36 @@ class MenuSeeder extends Seeder
                 'igv'       => 0,
                 'total'     => 50,
             ],
-        ];
-        $JALEAS = [
             [
+                'name'      => 'Cuy con papas',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+            [
+                'name'      => 'Lomo saltado',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+            [
+                'name'      => 'Arroz con pato',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+            [
+                'name'      => 'Cabrito a la chiclayana',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],
+            [
+                'name'      => 'Causa ferreñafana',
+                'sub_total' => 50,
+                'igv'       => 0,
+                'total'     => 50,
+            ],[
                 'name'      => 'Señor de sipan',
                 'sub_total' => 50,
                 'igv'       => 0,
@@ -223,20 +295,6 @@ class MenuSeeder extends Seeder
             ],
             [
                 'name'      => 'Tollo en trozos',
-                'sub_total' => 50,
-                'igv'       => 0,
-                'total'     => 50,
-            ],
-        ];
-        $TIRADITOS = [
-            [
-                'name'      => 'Tiradito a la crema amarilla',
-                'sub_total' => 50,
-                'igv'       => 0,
-                'total'     => 50,
-            ],
-            [
-                'name'      => 'Tiradito al  limón',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
@@ -317,44 +375,6 @@ class MenuSeeder extends Seeder
             ],
             [
                 'name'      => 'Arroz chaufa de tollo familiar',
-                'sub_total' => 50,
-                'igv'       => 0,
-                'total'     => 50,
-            ],
-        ];
-        $PARIHUELAS = [
-            [
-                'name'      => 'Reconciliadora',
-                'sub_total' => 50,
-                'igv'       => 0,
-                'total'     => 50,
-            ],
-            [
-                'name'      => 'Mero',
-                'sub_total' => 50,
-                'igv'       => 0,
-                'total'     => 50,
-            ],
-            [
-                'name'      => 'Cabrilla',
-                'sub_total' => 50,
-                'igv'       => 0,
-                'total'     => 50,
-            ],
-            [
-                'name'      => 'Congrio',
-                'sub_total' => 50,
-                'igv'       => 0,
-                'total'     => 50,
-            ],
-            [
-                'name'      => 'Tollo mediano',
-                'sub_total' => 50,
-                'igv'       => 0,
-                'total'     => 50,
-            ],
-            [
-                'name'      => 'Tollo familiar',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
@@ -559,118 +579,111 @@ class MenuSeeder extends Seeder
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Inka Kola 2L',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Inka Kola 1.5L',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Inka Kola 1L',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Inka Kola gordita',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Inka Kola personal',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Coca Cola 2L',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Coca Cola 1.5L',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Coca Cola 1L',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Coca Cola personal',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Cassinelli',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Sporade',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Agua',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
-             [
+            [
                 'name'      => 'Pulp',
                 'sub_total' => 50,
                 'igv'       => 0,
                 'total'     => 50,
             ],
         ];
-        $CRIOLLAS = [
+        $OTROS = [
             [
-                'name'      => 'Cuy con papas',
-                'sub_total' => 50,
+                'name'      => 'PLATO ROTO',
+                'sub_total' => 1,
                 'igv'       => 0,
-                'total'     => 50,
+                'total'     => 1,
             ],
             [
-                'name'      => 'Lomo saltado',
-                'sub_total' => 50,
+                'name'      => 'VASO ROTO',
+                'sub_total' => 1,
                 'igv'       => 0,
-                'total'     => 50,
+                'total'     => 1,
             ],
             [
-                'name'      => 'Arroz con pato',
-                'sub_total' => 50,
+                'name'      => 'BOTELLA ROTO',
+                'sub_total' => 1,
                 'igv'       => 0,
-                'total'     => 50,
+                'total'     => 1,
             ],
             [
-                'name'      => 'Cabrito a la chiclayana',
-                'sub_total' => 50,
+                'name'      => 'TAPER',
+                'sub_total' => 1,
                 'igv'       => 0,
-                'total'     => 50,
-            ],
-            [
-                'name'      => 'Causa ferreñafana',
-                'sub_total' => 50,
-                'igv'       => 0,
-                'total'     => 50,
+                'total'     => 1,
             ],
         ];
-
         foreach ($CEVICHES as $key => $value) {
             Menu::create([
                 'menu_family_id' => 1,
@@ -682,53 +695,9 @@ class MenuSeeder extends Seeder
                 'shop_id'        => 1
             ]);
         }
-        foreach ($CHILCANOS as $key => $value) {
+        foreach ($PARIHUELAS as $key => $value) {
             Menu::create([
                 'menu_family_id' => 2,
-                'printer'        => 'cocina',
-                'name'           => $value['name'],
-                'sub_total'      => $value['sub_total'],
-                'igv'            => $value['igv'],
-                'total'          => $value['total'],
-                'shop_id'        => 1
-            ]);
-        }
-        foreach ($RONDAS as $key => $value) {
-            Menu::create([
-                'menu_family_id' => 3,
-                'printer'        => 'cocina',
-                'name'           => $value['name'],
-                'sub_total'      => $value['sub_total'],
-                'igv'            => $value['igv'],
-                'total'          => $value['total'],
-                'shop_id'        => 1
-            ]);
-        }
-        foreach ($FRITURAS as $key => $value) {
-            Menu::create([
-                'menu_family_id' => 4,
-                'printer'        => 'cocina',
-                'name'           => $value['name'],
-                'sub_total'      => $value['sub_total'],
-                'igv'            => $value['igv'],
-                'total'          => $value['total'],
-                'shop_id'        => 1
-            ]);
-        }
-        foreach ($JALEAS as $key => $value) {
-            Menu::create([
-                'menu_family_id' => 5,
-                'printer'        => 'cocina',
-                'name'           => $value['name'],
-                'sub_total'      => $value['sub_total'],
-                'igv'            => $value['igv'],
-                'total'          => $value['total'],
-                'shop_id'        => 1
-            ]);
-        }
-        foreach ($TIRADITOS as $key => $value) {
-            Menu::create([
-                'menu_family_id' => 6,
                 'printer'        => 'cocina',
                 'name'           => $value['name'],
                 'sub_total'      => $value['sub_total'],
@@ -739,29 +708,7 @@ class MenuSeeder extends Seeder
         }
         foreach ($ARROCES as $key => $value) {
             Menu::create([
-                'menu_family_id' => 7,
-                'printer'        => 'cocina',
-                'name'           => $value['name'],
-                'sub_total'      => $value['sub_total'],
-                'igv'            => $value['igv'],
-                'total'          => $value['total'],
-                'shop_id'        => 1
-            ]);
-        }
-        foreach ($PARIHUELAS as $key => $value) {
-            Menu::create([
-                'menu_family_id' => 8,
-                'printer'        => 'cocina',
-                'name'           => $value['name'],
-                'sub_total'      => $value['sub_total'],
-                'igv'            => $value['igv'],
-                'total'          => $value['total'],
-                'shop_id'        => 1
-            ]);
-        }
-        foreach ($SUDADOS as $key => $value) {
-            Menu::create([
-                'menu_family_id' => 9,
+                'menu_family_id' => 3,
                 'printer'        => 'cocina',
                 'name'           => $value['name'],
                 'sub_total'      => $value['sub_total'],
@@ -772,18 +719,7 @@ class MenuSeeder extends Seeder
         }
         foreach ($CHICHARRONES as $key => $value) {
             Menu::create([
-                'menu_family_id' => 10,
-                'printer'        => 'cocina',
-                'name'           => $value['name'],
-                'sub_total'      => $value['sub_total'],
-                'igv'            => $value['igv'],
-                'total'          => $value['total'],
-                'shop_id'        => 1
-            ]);
-        }
-        foreach ($GUARNICIONES as $key => $value) {
-            Menu::create([
-                'menu_family_id' => 11,
+                'menu_family_id' => 4,
                 'printer'        => 'cocina',
                 'name'           => $value['name'],
                 'sub_total'      => $value['sub_total'],
@@ -794,204 +730,58 @@ class MenuSeeder extends Seeder
         }
         foreach ($BEBIDAS as $key => $value) {
             Menu::create([
-                'menu_family_id' => 12,
-                'printer'        => 'cocina',
-                'name'           => $value['name'],
-                'sub_total'      => $value['sub_total'],
-                'igv'            => $value['igv'],
-                'total'          => $value['total'],
-                'shop_id'        => 1
-            ]);
-        }
-        foreach ($CRIOLLAS as $key => $value) {
-            Menu::create([
-                'menu_family_id' => 13,
-                'printer'        => 'cocina',
-                'name'           => $value['name'],
-                'sub_total'      => $value['sub_total'],
-                'igv'            => $value['igv'],
-                'total'          => $value['total'],
-                'shop_id'        => 1
-            ]);
-        }
-
-        /*
-           Menu::create([
-                'menu_family_id' => 1,
-                'printer'        => 'cocina',
-                'name'           => '1 POLLO A LA BRASA+PORCION DE PAPAS+PORCION DE ENSALADA+CREMAS',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 1,
-                'printer'        => 'cocina',
-                'name'           => '1/2 POLLO A LA BRASA+PORCION DE PASAS+PORCION DE ENSALADA+CREMAS',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 1,
-                'printer'        => 'cocina',
-                'name'           => '1/4 POLLO A LA BRASA+PORCION DE PASAS+PORCION DE ENSALADA+CREMAS',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 1,
-                'printer'        => 'cocina',
-                'name'           => '1 POLLO A LA BRASA+PORCION DE PASAS+PORCION DE ENSALADA+CREMAS+INKA KOLA 1.5 LITRO',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 1,
-                'printer'        => 'cocina',
-                'name'           => '1 POLLO A LA BRASA+PORCION DE PASAS+PORCION DE ENSALADA+CREMAS+ PEPSI 1.5 LITRO',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 1,
-                'printer'        => 'cocina',
-                'name'           => '1/2 POLLO A LA BRASA+PORCION DE PASAS+PORCION DE ENSALADA+CREMAS+GASEOSA 1.5 LITROS',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 1,
-                'printer'        => 'cocina',
-                'name'           => 'POLLO SOLO',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 2,
-                'printer'        => 'cocina',
-                'name'           => 'GASEOSA 1.5LT INKA KOLA',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 3,
-                'printer'        => 'cocina',
-                'name'           => '1 PORCION DE PAPAS',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 3,
-                'printer'        => 'cocina',
-                'name'           => '1 PORCION DE ARROZ',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 3,
-                'printer'        => 'cocina',
-                'name'           => '1 PORCION DE ENSALADA',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 3,
-                'printer'        => 'cocina',
-                'name'           => '1 PORCION DE MOLLEJITAS FRITAS',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
-                'menu_family_id' => 4,
-                'printer'        => 'cocina',
-                'name'           => '1 PEPSI  DE 500 ML.',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
-                'shop_id'        => 1
-            ]);
-           Menu::create([
                 'menu_family_id' => 5,
                 'printer'        => 'cocina',
-                'name'           => 'TAPER PARA POLLO',
-                'sub_total'      => 33.89,
-                'igv'            => 6.10,
-                'total'          => 39.99,
-                'state'          => 'A',
+                'name'           => $value['name'],
+                'sub_total'      => $value['sub_total'],
+                'igv'            => $value['igv'],
+                'total'          => $value['total'],
                 'shop_id'        => 1
             ]);
-
-            DB::table('menu_supply')->insert(
-                [
-                    'supply_id'      => 1,
-                    'menu_id'        => 1,
-                    'quantity'       => 4,
-                ]
-            );
-            DB::table('menu_supply')->insert(
-                [
-                    'supply_id'      => 2,
-                    'menu_id'        => 1,
-                    'quantity'       => 4,
-                ]
-            );
-            DB::table('menu_supply')->insert(
-                [
-                    'supply_id'      => 1,
-                    'menu_id'        => 2,
-                    'quantity'       => 8,
-                ]
-            );
-            DB::table('menu_supply')->insert(
-                [
-                    'supply_id'      => 2,
-                    'menu_id'        => 2,
-                    'quantity'       => 7,
-                ]
-            );
-            DB::table('menu_supply')->insert(
-                [
-                    'supply_id'      => 4,
-                    'menu_id'        => 2,
-                    'quantity'       => 1,
-                ]
-            );
-            */
+        }
+        foreach ($SUDADOS as $key => $value) {
+            Menu::create([
+                'menu_family_id' => 6,
+                'printer'        => 'cocina',
+                'name'           => $value['name'],
+                'sub_total'      => $value['sub_total'],
+                'igv'            => $value['igv'],
+                'total'          => $value['total'],
+                'shop_id'        => 1
+            ]);
+        }
+        foreach ($CARTA as $key => $value) {
+            Menu::create([
+                'menu_family_id' => 7,
+                'printer'        => 'cocina',
+                'name'           => $value['name'],
+                'sub_total'      => $value['sub_total'],
+                'igv'            => $value['igv'],
+                'total'          => $value['total'],
+                'shop_id'        => 1
+            ]);
+        }
+        foreach ($GUARNICIONES as $key => $value) {
+            Menu::create([
+                'menu_family_id' => 8,
+                'printer'        => 'cocina',
+                'name'           => $value['name'],
+                'sub_total'      => $value['sub_total'],
+                'igv'            => $value['igv'],
+                'total'          => $value['total'],
+                'shop_id'        => 1
+            ]);
+        }
+        foreach ($OTROS as $key => $value) {
+            Menu::create([
+                'menu_family_id' => 9,
+                'printer'        => 'cocina',
+                'name'           => $value['name'],
+                'sub_total'      => $value['sub_total'],
+                'igv'            => $value['igv'],
+                'total'          => $value['total'],
+                'shop_id'        => 1
+            ]);
+        }
     }
 }
