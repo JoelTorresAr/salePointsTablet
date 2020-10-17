@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\CreateCommandBinnacle;
 use App\Jobs\WarehouseDecrement;
 use App\Models\Command;
+use App\Models\Opening;
 use App\Models\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,10 @@ class TicketController extends Controller
 {
     public function cocina(Request $request)
     {
+        $cash_box_id = $request['id_caja'];
+        if (!$opening = Opening::where([['cash_box_id', $cash_box_id], ['state', 'A']])->value('id')) {
+            return  response()->json(['msg' => 'No se aperturo caja'], 401);
+        }
         $mozo = $request['mozo'];
         $shop_id = $request['shop_id'];
         $user_id = $request['user_id'];
@@ -63,6 +68,10 @@ class TicketController extends Controller
 
     public function precuenta(Request $request)
     {
+        $cash_box_id = $request['id_caja'];
+        if (!$opening = Opening::where([['cash_box_id', $cash_box_id], ['state', 'A']])->value('id')) {
+            return  response()->json(['msg' => 'No se aperturo caja'], 401);
+        }
         $mozo = $request['mozo'];
         $user_id = $request['user_id'];
         $id_cmd = Table::where('id', $request['id_mesa'])->value('command_id');

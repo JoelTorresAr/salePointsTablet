@@ -142,6 +142,7 @@ export default {
     cantidad: 0,
     userID: 0,
     pin: undefined,
+    cash_box_id: undefined,
     disableMinusBtn: false
   }),
   watch: {
@@ -162,6 +163,7 @@ export default {
     this.mesa = JSON.parse(this.$store.getters.get_MESA_ACTUAL);
     this.mesaId = this.$store.getters.get_ID_MESA_ACTUAL;
     this.userID = this.$store.getters.getUSERID;
+    this.cash_box_id = this.$store.getters.getCASH_BOX_ID;
     this.config = JSON.parse(this.$store.getters.getCONFIG_AXIOS);
     this.getArticlesinMesa();
   },
@@ -176,7 +178,8 @@ export default {
         .post(
           url,
           {
-            id_mesa: this.mesaId
+            id_mesa: this.mesaId,
+            id_caja: this.cash_box_id
           },
           this.config
         )
@@ -213,7 +216,8 @@ export default {
           url,
           {
             id_mesa: this.mesaId,
-            id_producto: item.id
+            id_producto: item.id,
+            id_caja: this.cash_box_id,
           },
           this.config
         )
@@ -250,7 +254,8 @@ export default {
           url,
           {
             id_mesa: this.mesaId,
-            nota: this.noteCmd
+            nota: this.noteCmd,
+            id_caja: this.cash_box_id,
           },
           this.config
         )
@@ -315,7 +320,8 @@ export default {
             id_detalle: id_detalle,
             cantidad: cant,
             restring: restring,
-            auth: auth
+            auth: auth,
+            id_caja: this.cash_box_id,
           },
           this.config
         )
@@ -383,7 +389,8 @@ export default {
             mozo: user,
             user_id: this.userID,
             tipo: "cocina",
-            shop_id: store_id
+            shop_id: store_id,
+            id_caja: this.cash_box_id,
           },
           this.config
         )
@@ -431,7 +438,8 @@ export default {
               mesa: this.mesa.nombre,
               mozo: user,
               user_id: this.userID,
-              tipo: "precuenta"
+              tipo: "precuenta",
+            id_caja: this.cash_box_id,
             },
             this.config
           )
@@ -473,7 +481,8 @@ export default {
         .post(
           url,
           {
-            id_mesa: this.mesaId
+            id_mesa: this.mesaId,
+            id_caja: this.cash_box_id
           },
           this.config
         )

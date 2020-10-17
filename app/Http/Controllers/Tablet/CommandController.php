@@ -9,6 +9,7 @@ use App\Models\Command;
 use App\Models\CommandMenu;
 use App\Models\Floor;
 use App\Models\Menu;
+use App\Models\Opening;
 use App\Models\Table;
 use App\User;
 use Exception;
@@ -57,7 +58,15 @@ class CommandController extends Controller
     public function nuevaComanda(Request $request)
     {
         $id_mesa = $request['id'];
+       // $cash_box_id = $request['id_caja'];
+        
+        
         $mesa = Table::where('id', $id_mesa)->first();
+        $piso = Floor::where('id', $mesa['floor_id'])->first();
+
+        if (!$opening = Opening::where([['cash_box_id', $piso['cash_box_id']], ['state', 'A']])->value('id')) {
+            return  response()->json(['msg' => 'No se aperturo caja'], 401);
+        }
         if (!$mozo = auth('api')->user()) {
             return response()->json(['msg' =>  'usuario no autenticado', 'status' => 401], 200);
         }
@@ -68,7 +77,6 @@ class CommandController extends Controller
 
             DB::beginTransaction();
             try {
-                $piso = Floor::where('id', $mesa['floor_id'])->first();
                 $id_cmd = DB::table('commands')->insertGetId(
                     [
                         'cash_box_id'       => $piso['cash_box_id'],
@@ -134,6 +142,10 @@ class CommandController extends Controller
     {
         $id_cmd = Table::where('id', $request['id_mesa'])->value('command_id');
         $nota = $request['nota'];
+        $cash_box_id = $request['id_caja'];
+        if (!$opening = Opening::where([['cash_box_id', $cash_box_id], ['state', 'A']])->value('id')) {
+            return  response()->json(['msg' => 'No se aperturo caja'], 401);
+        }
 
         DB::beginTransaction();
         try {
@@ -156,6 +168,10 @@ class CommandController extends Controller
     {
         $id_cmd = Table::where('id', $request['id_mesa'])->value('command_id');
         $id_prod = $request['id_producto'];
+        $cash_box_id = $request['id_caja'];
+        if (!$opening = Opening::where([['cash_box_id', $cash_box_id], ['state', 'A']])->value('id')) {
+            return  response()->json(['msg' => 'No se aperturo caja'], 401);
+        }
 
         $item = Menu::where('id', $id_prod)->first();
         if ($detalle = CommandMenu::where([['command_id', $id_cmd], ['menu_id', $id_prod]])->first()) {
@@ -167,11 +183,19 @@ class CommandController extends Controller
     public function listarItemsMesa(Request $request)
     {
         $id_cmd = Table::where('id', $request['id_mesa'])->value('command_id');
+        $cash_box_id = $request['id_caja'];
+        if (!$opening = Opening::where([['cash_box_id', $cash_box_id], ['state', 'A']])->value('id')) {
+            return  response()->json(['msg' => 'No se aperturo caja'], 401);
+        }
 
         return $this->responseWithItemsInComanda($id_cmd);
     }
     public function alterarLista(Request $request)
     {
+        $cash_box_id = $request['id_caja'];
+        if (!$opening = Opening::where([['cash_box_id', $cash_box_id], ['state', 'A']])->value('id')) {
+            return  response()->json(['msg' => 'No se aperturo caja'], 401);
+        }
         $id_cmd  = Table::where('id', $request['id_mesa'])->value('command_id');
         $item = Menu::where('id', $request['id_producto'])->first();
         $id_detalle = $request['id_detalle'];
@@ -363,6 +387,10 @@ class CommandController extends Controller
     }
     public function liberar(Request $request)
     {
+        $cash_box_id = $request['id_caja'];
+        if (!$opening = Opening::where([['cash_box_id', $cash_box_id], ['state', 'A']])->value('id')) {
+            return  response()->json(['msg' => 'No se aperturo caja'], 401);
+        }
         $mesa = Table::where('id', $request->id_mesa)->first();
         DB::beginTransaction();
         try {
