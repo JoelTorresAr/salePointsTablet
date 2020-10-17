@@ -12,16 +12,21 @@ class TableSeeder extends Seeder
      */
     public function run()
     {
-        $array = ['A','I'];
-        $arrayStatus = ['L','O'];
-        $floors = Floor::get();
-        foreach ($floors as $key => $floor) {
-            for ($i=1; $i < 8; $i++) { 
-                $floor->tables()->Create([
-                    'name'   => 'Mesa 0'.$i,
-                    'state'  => $array[array_rand($array, 1)],
+        $floor1 = Floor::where('id', 1)->first();
+        $floor2 = Floor::where('id', 2)->first();
+        for ($i = 1; $i < 61; $i++) {
+            if ($i < 46) {
+                $floor1->tables()->Create([
+                    'name'   => 'Mesa ' . $i,
+                    'state'  => 'A',
                     'status' => 'L'
-                ]);     
+                ]);
+            } else {
+                $floor2->tables()->Create([
+                    'name'   => 'Mesa ' . $i,
+                    'state'  => 'A',
+                    'status' => 'L'
+                ]);
             }
         }
     }

@@ -144,6 +144,14 @@ export default {
     pin: undefined,
     disableMinusBtn: false
   }),
+  watch: {
+    familias(val) {
+      if (val.length > 0) {
+        var item = val[0];
+        this.getArticles(item);
+      }
+    }
+  },
   computed: {
     artList() {
       return this.articlesEnMesa;

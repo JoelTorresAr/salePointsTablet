@@ -42,7 +42,7 @@ class CommandController extends Controller
                 'tables.order_status as orden',
                 'commands.editing_by_name as mesero',
             )
-            ->orderBy('tables.name')
+            ->orderBy('tables.id')
             //->whereNull('commands.admin_id')
             ->get();
 
