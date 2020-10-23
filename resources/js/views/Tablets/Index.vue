@@ -219,6 +219,7 @@ export default {
           break;
         case "SEPARAR":
           if (this.showJoins) {
+            this.actionButton = "";
             this.showJoins = !this.showJoins;
             this.separarMesas();
           } else {
@@ -229,6 +230,7 @@ export default {
           break;
         case "MOVER":
           if (this.showJoins) {
+            this.actionButton = "";
             this.showJoins = !this.showJoins;
             this.moverMesas();
           } else {

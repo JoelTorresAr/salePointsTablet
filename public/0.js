@@ -158,8 +158,17 @@ __webpack_require__.r(__webpack_exports__);
       cantidad: 0,
       userID: 0,
       pin: undefined,
+      cash_box_id: undefined,
       disableMinusBtn: false
     };
+  },
+  watch: {
+    familias: function familias(val) {
+      if (val.length > 0) {
+        var item = val[0];
+        this.getArticles(item);
+      }
+    }
   },
   computed: {
     artList: function artList() {
@@ -171,6 +180,7 @@ __webpack_require__.r(__webpack_exports__);
     this.mesa = JSON.parse(this.$store.getters.get_MESA_ACTUAL);
     this.mesaId = this.$store.getters.get_ID_MESA_ACTUAL;
     this.userID = this.$store.getters.getUSERID;
+    this.cash_box_id = this.$store.getters.getCASH_BOX_ID;
     this.config = JSON.parse(this.$store.getters.getCONFIG_AXIOS);
     this.getArticlesinMesa();
   },
@@ -184,7 +194,8 @@ __webpack_require__.r(__webpack_exports__);
 
       var url = "api/tablet/comanda/item/listar";
       axios.post(url, {
-        id_mesa: this.mesaId
+        id_mesa: this.mesaId,
+        id_caja: this.cash_box_id
       }, this.config).then(function (_ref) {
         var data = _ref.data;
 
@@ -216,7 +227,8 @@ __webpack_require__.r(__webpack_exports__);
       var url = "api/tablet/comanda/item/agregar ";
       axios.post(url, {
         id_mesa: this.mesaId,
-        id_producto: item.id
+        id_producto: item.id,
+        id_caja: this.cash_box_id
       }, this.config).then(function (_ref2) {
         var data = _ref2.data;
 
@@ -248,7 +260,8 @@ __webpack_require__.r(__webpack_exports__);
       var url = "api/tablet/comanda/nota";
       axios.post(url, {
         id_mesa: this.mesaId,
-        nota: this.noteCmd
+        nota: this.noteCmd,
+        id_caja: this.cash_box_id
       }, this.config).then(function (_ref3) {
         var data = _ref3.data;
         _this3.dialog = false;
@@ -312,7 +325,8 @@ __webpack_require__.r(__webpack_exports__);
         id_detalle: id_detalle,
         cantidad: cant,
         restring: restring,
-        auth: auth
+        auth: auth,
+        id_caja: this.cash_box_id
       }, this.config).then(function (_ref4) {
         var data = _ref4.data;
         _this4.disableMinusBtn = false;
@@ -379,7 +393,8 @@ __webpack_require__.r(__webpack_exports__);
         mozo: user,
         user_id: this.userID,
         tipo: "cocina",
-        shop_id: store_id
+        shop_id: store_id,
+        id_caja: this.cash_box_id
       }, this.config).then(function (_ref5) {
         var data = _ref5.data;
 
@@ -426,7 +441,8 @@ __webpack_require__.r(__webpack_exports__);
           mesa: this.mesa.nombre,
           mozo: user,
           user_id: this.userID,
-          tipo: "precuenta"
+          tipo: "precuenta",
+          id_caja: this.cash_box_id
         }, this.config).then(function (_ref6) {
           var data = _ref6.data;
 
@@ -466,7 +482,8 @@ __webpack_require__.r(__webpack_exports__);
 
       var url = "api/tablet/comanda/liberar";
       axios.post(url, {
-        id_mesa: this.mesaId
+        id_mesa: this.mesaId,
+        id_caja: this.cash_box_id
       }, this.config).then(function (_ref7) {
         var data = _ref7.data;
 
