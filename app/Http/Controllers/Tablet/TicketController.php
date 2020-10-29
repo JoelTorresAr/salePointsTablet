@@ -251,6 +251,7 @@ class TicketController extends Controller
             $impresora->setEmphasis(true);
             //$impresora->setFont(Printer::FONT_B);
             $impresora->text("MOZO: " . $mozo . "\n");
+            $impresora->text("N°: " . $command->id . "\n");
             $impresora->text("Fecha-Hora: " . $date_time . "\n");
             $impresora->feed(1);
             $impresora->setFont(Printer::FONT_B);
@@ -262,8 +263,7 @@ class TicketController extends Controller
                 $asterisco = $asterisco . '*';
                 $linea = $linea . '-';
             }
-            $impresora->text($asterisco . "\n");
-            $impresora->feed(2);
+            $impresora->text($linea . "\n");
             //Items
             $impresora->setEmphasis(false);
             $impresora->setJustification(Printer::JUSTIFY_RIGHT);
@@ -273,9 +273,9 @@ class TicketController extends Controller
                 $cant   =  $value->cant;
                 $total = $value->total;
                 $impresora->text(new itemPrecuenta($cant, $nombre, $total));
-                $impresora->feed(1);
             }
 
+            $impresora->feed(1);
             $impresora->text($linea . "\n");
             $impresora->feed(1);
             $impresora->setEmphasis(true);
