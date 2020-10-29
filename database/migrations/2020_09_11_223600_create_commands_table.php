@@ -38,6 +38,9 @@ class CreateCommandsTable extends Migration
             $table->string('number',8)->nullable();
             $table->integer('print_number')->default(0);
             $table->dateTime('date_time',0)->useCurrent();
+            $table->integer('send_sunat')->default(0);
+            $table->integer('i_sunat')->default(0);
+
 
             $table->foreign('editing_by_id')->references('id')->on('users')
             ->onDelete('cascade')

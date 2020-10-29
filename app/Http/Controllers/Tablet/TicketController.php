@@ -147,7 +147,7 @@ class TicketController extends Controller
             // Cabecera de ticket
             $impresora->setDoubleStrike(false);
             $impresora->setJustification(Printer::JUSTIFY_CENTER);
-            $impresora->setTextSize(8, 8);
+            $impresora->setTextSize(2, 2);
             $impresora->setFont(Printer::FONT_B);/*
             $impresora->text("COCINA \n");
             $impresora->setTextSize(4, 4);
@@ -158,13 +158,18 @@ class TicketController extends Controller
             $impresora->feed(1);
 
             //Detalle
-            $impresora->setJustification(Printer::JUSTIFY_LEFT);
+            //$impresora->setJustification(Printer::JUSTIFY_LEFT);
             $impresora->setEmphasis(true);
+            $impresora->setFont(Printer::FONT_A);
+            $impresora->setTextSize(1, 1);
             $impresora->text("MOZO: " . $mozo . "\n");
             $impresora->text("Fecha-Hora: " . $date_time . "\n");
+            $impresora->text("Comanda: " . $id_cmd . "\n");
             $impresora->feed(1);
+            $impresora->text(new itemCocina('CANT', '                            PRODUCTO'));
+            $impresora->setTextSize(2, 2);
+            $impresora->setFont(Printer::FONT_B);
             $impresora->setJustification(Printer::JUSTIFY_RIGHT);
-            $impresora->text(new itemCocina('CANT', 'PRODUCTO'));
             $impresora->setJustification(Printer::JUSTIFY_CENTER);
             $impresora->text("******************************\n");
             $impresora->feed(2);
@@ -238,16 +243,17 @@ class TicketController extends Controller
             // Cabecera de ticket
             $impresora->setDoubleStrike(false);
             $impresora->setJustification(Printer::JUSTIFY_CENTER);
-            $impresora->setTextSize(4, 1.5);
+            $impresora->setTextSize(3, 3);
             $impresora->text("PRE-CUENTA\n");
             $impresora->feed(1);
             $impresora->setJustification(Printer::JUSTIFY_LEFT);
-            $impresora->setTextSize(1, 1.5);
+            $impresora->setTextSize(1, 1);
             $impresora->setEmphasis(true);
-            $impresora->setFont(Printer::FONT_B);
+            //$impresora->setFont(Printer::FONT_B);
             $impresora->text("MOZO: " . $mozo . "\n");
             $impresora->text("Fecha-Hora: " . $date_time . "\n");
             $impresora->feed(1);
+            $impresora->setFont(Printer::FONT_B);
             $impresora->setJustification(Printer::JUSTIFY_RIGHT);
             $impresora->text(new itemPrecuenta('Cant ', 'Descripcion', 'Sub Total'));
             $asterisco = '';
