@@ -16,18 +16,18 @@ class UserSeeder extends Seeder
         //$business = Business::select('id')->where('ruc', '12345678921')->firstOrFail();
         $business =  Business::select('id')->firstOrFail();
         $business->users()->Create([
-            'name'        => 'prueba',
+            'name'        => 'MOZO 1',
             'password'    => 'prueba',
             'pin'         => '1234',
             'state'      => 'A'
         ]);
         $business->users()->Create([
-            'name'        => 'JOEL',
+            'name'        => 'MOZO 2',
             'pin'         => '5454',
             'state'      => 'A'
         ]);
         $business->users()->Create([
-            'name'        => 'EFRAIN',
+            'name'        => 'ADMINISTRADOR',
             'pin'         => '6666',
             'state'      => 'A'
         ]);
