@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Tablet;
 
-use App\Events\CommandBinnacle;
 use App\Http\Controllers\Controller;
 use App\Jobs\CreateCommandBinnacle;
 use App\Models\Command;
