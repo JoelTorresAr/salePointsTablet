@@ -19,7 +19,7 @@ class CreateCashBoxesTable extends Migration
             $table->string('name',50);
             $table->string('printer_name');
             $table->string('state',1);
-            $table->string('mac',50);
+            $table->string('mac',50)->nullable();
 
             $table->foreign('shop_id')->references('id')->on('shops')
             ->onDelete('cascade')
